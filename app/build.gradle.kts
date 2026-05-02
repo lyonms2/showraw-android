@@ -55,6 +55,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        prefab = true  // expõe Oboe (e outros AARs com Prefab) ao CMake via find_package()
     }
 }
 
