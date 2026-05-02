@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">ShowRaw</string>
+    <string name="slogan">Grave o que importa. Do jeito que realmente soa.</string>
+
+    <!-- Presets -->
+    <string name="preset_show">Show / Concerto</string>
+    <string name="preset_sport">Esporte / Estádio</string>
+    <string name="preset_outdoor">Ao ar livre</string>
+    <string name="preset_vlog">Vlog / Rua</string>
+    <string name="preset_indoor">Ambiente interno</string>
+    <string name="preset_bar">Bar / Restaurante</string>
+    <string name="preset_talk">Palestra / Evento</string>
+    <string name="preset_manual">Manual (Pro)</string>
+
+    <!-- Hardware validation -->
+    <string name="hw_raw_ok">✅ Modo RAW confirmado neste aparelho</string>
+    <string name="hw_raw_warn">⚠️ Modo RAW não confirmado. O áudio pode conter processamento nativo. Recomendamos microfone externo.</string>
+
+    <!-- Recording -->
+    <string name="btn_record">Gravar</string>
+    <string name="btn_pause">Pausar</string>
+    <string name="btn_stop">Parar</string>
+    <string name="badge_raw">RAW</string>
+
+    <!-- Storage warnings -->
+    <string name="storage_critical">Espaço insuficiente para gravar. Libere espaço e tente novamente.</string>
+    <string name="storage_low">Apenas %1$d minutos disponíveis.</string>
+
+    <!-- SPL warning -->
+    <string name="spl_warning">Volume muito alto para o microfone interno.\nO limiter não consegue recuperar este sinal.\nConecte um microfone externo ou afaste-se da fonte sonora.</string>
+
+    <!-- Export -->
+    <string name="export_video_final">Vídeo final (MP4)</string>
+    <string name="export_stems_wav">Stems separados (WAV)</string>
+    <string name="export_both">Vídeo + Stems</string>
+</resources>

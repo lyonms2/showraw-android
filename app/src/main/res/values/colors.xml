@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Identidade ShowRaw -->
+    <color name="primary">#EF9F27</color>
+    <color name="primary_dark">#854F0B</color>
+    <color name="primary_light">#FAC775</color>
+
+    <!-- Backgrounds -->
+    <color name="bg_main">#0D0D0D</color>
+    <color name="bg_card">#1A1A1A</color>
+    <color name="bg_card_active">#1E1E1E</color>
+    <color name="border">#2A2A2A</color>
+
+    <!-- Estados -->
+    <color name="alert_red">#E24B4A</color>
+    <color name="white">#FFFFFF</color>
+    <color name="text_secondary">#999999</color>
+
+    <!-- VU meter -->
+    <color name="vu_green">#22C55E</color>
+    <color name="vu_yellow">#EAB308</color>
+    <color name="vu_red">#EF4444</color>
+</resources>
