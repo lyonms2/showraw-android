@@ -1,58 +1,184 @@
 package com.showraw.android.ui.recording
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.showraw.android.Navigator
+import com.showraw.android.R
 import com.showraw.android.audio.AudioEngine
 import com.showraw.android.audio.AudioStats
+import com.showraw.android.audio.WavWriter
+import com.showraw.android.databinding.FragmentRecordingBinding
+import com.showraw.android.presets.Preset
 import com.showraw.android.presets.PresetRepository
 import com.showraw.android.video.VideoCaptureManager
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-/**
- * Tela 2 — viewfinder da câmera + VU meter + stats em tempo real.
- * Exibe: Limiter GR, Mic blend, Pico, Release, badge RAW, tempo gravado,
- * tempo restante de armazenamento. Botões: Pausar / Parar.
- */
 class RecordingFragment : Fragment() {
 
-    private val audioEngine = AudioEngine()
+    private var _binding: FragmentRecordingBinding? = null
+    private val binding get() = _binding!!
+
+    private lateinit var preset: Preset
     private lateinit var videoManager: VideoCaptureManager
+    private lateinit var permLauncher: ActivityResultLauncher<Array<String>>
+
+    private val audioEngine = AudioEngine()
+
+    private var wavWriter: WavWriter? = null
+    private var tempVideo: File? = null
+    private var pendingWavFile: File? = null
+    private var isRecording = false
+    private var recordStart = 0L
+
+    private val timerHandler = Handler(Looper.getMainLooper())
+    private val timerRunnable = object : Runnable {
+        override fun run() {
+            val secs = (System.currentTimeMillis() - recordStart) / 1000
+            _binding?.tvTimer?.text = "%02d:%02d".format(secs / 60, secs % 60)
+            timerHandler.postDelayed(this, 1_000)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val presetId = arguments?.getString(ARG_PRESET_ID) ?: "show"
-        val preset   = PresetRepository.findById(presetId) ?: PresetRepository.all.first()
+        preset = PresetRepository.findById(presetId) ?: PresetRepository.all.first()
         audioEngine.configure(preset)
+
+        permLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { perms ->
+            if (perms.values.all { it }) {
+                bindCamera()
+            } else {
+                Toast.makeText(requireContext(), "Câmera e microfone são necessários.", Toast.LENGTH_LONG).show()
+                @Suppress("DEPRECATION")
+                requireActivity().onBackPressed()
+            }
+        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
-    ): View? {
-        // TODO: inflar R.layout.fragment_recording com PreviewView + VU meter custom view
-        return super.onCreateView(inflater, container, savedInstanceState)
+    ): View {
+        _binding = FragmentRecordingBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        audioEngine.onStats    = ::updateStats
-        audioEngine.onSplWarning = ::showSplWarning
-        // TODO: iniciar câmera e áudio juntos
-        // TODO: VU meter: verde ≤ -18 dBFS | amarelo -18 a -6 | vermelho > -6
+
+        videoManager = VideoCaptureManager(requireContext())
+        binding.tvPresetName.text = "${preset.emoji} ${preset.name}"
+
+        audioEngine.onStats      = { stats -> activity?.runOnUiThread { updateStats(stats) } }
+        audioEngine.onSplWarning = { activity?.runOnUiThread { _binding?.tvSplWarning?.visibility = View.VISIBLE } }
+
+        binding.btnStop.setOnClickListener { stopRecording() }
+
+        checkAndRequestPermissions()
+    }
+
+    private fun checkAndRequestPermissions() {
+        val needed = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+            .filter { ContextCompat.checkSelfPermission(requireContext(), it) != PackageManager.PERMISSION_GRANTED }
+            .toTypedArray()
+        if (needed.isEmpty()) bindCamera() else permLauncher.launch(needed)
+    }
+
+    private fun bindCamera() {
+        videoManager.bindToLifecycle(viewLifecycleOwner, binding.previewView, preset) {
+            startRecording()
+        }
+    }
+
+    private fun startRecording() {
+        val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+        tempVideo = File(requireContext().getExternalFilesDir(null), "tmp_video_$ts.mp4")
+        val wavFile = File(requireContext().getExternalFilesDir(null), "tmp_audio_$ts.wav")
+
+        videoManager.startRecording(
+            outputFile = tempVideo!!,
+            onStarted = {
+                wavWriter = WavWriter(wavFile)
+                audioEngine.onBufferReady = { buf, size -> wavWriter?.write(buf, size) }
+                audioEngine.start()
+
+                isRecording = true
+                recordStart = System.currentTimeMillis()
+                timerHandler.post(timerRunnable)
+
+                _binding?.tvRecDot?.visibility = View.VISIBLE
+                _binding?.tvSplWarning?.visibility = View.GONE
+                _binding?.btnStop?.isEnabled = true
+            },
+            onFinalized = { success ->
+                _binding?.overlayFinalizing?.visibility = View.GONE
+                val vFile = tempVideo
+                val wFile = pendingWavFile
+                if (success && vFile != null && wFile != null) {
+                    (activity as? Navigator)?.showExport(vFile.absolutePath, wFile.absolutePath)
+                } else if (isAdded) {
+                    Toast.makeText(requireContext(), "Erro ao finalizar gravação.", Toast.LENGTH_SHORT).show()
+                }
+            },
+        )
+    }
+
+    private fun stopRecording() {
+        if (!isRecording) return
+        timerHandler.removeCallbacks(timerRunnable)
+        audioEngine.stop()
+        pendingWavFile = wavWriter?.file
+        wavWriter?.finish()
+        wavWriter = null
+        isRecording = false
+
+        binding.tvRecDot.visibility = View.GONE
+        binding.btnStop.isEnabled = false
+        binding.overlayFinalizing.visibility = View.VISIBLE
+
+        videoManager.stopRecording()
     }
 
     private fun updateStats(stats: AudioStats) {
-        // TODO: atualizar UI com stats.rms, peakDbFs, gainReductionDb
-    }
+        val b = _binding ?: return
+        val peak = stats.peakDbFs.coerceIn(-96f, 0f)
+        b.tvPeak.text = "${"%.1f".format(peak)} dBFS"
+        b.tvGr.text   = "${"%.1f".format(stats.gainReductionDb)} dB"
 
-    private fun showSplWarning() {
-        // TODO: exibir overlay vermelho com opções (continuar / mic externo / parar)
+        val progress = (96 + peak).toInt().coerceIn(0, 96)
+        b.vuBar.progress = progress
+        b.vuBar.progressTintList = ColorStateList.valueOf(
+            when {
+                peak > -6f  -> ContextCompat.getColor(requireContext(), R.color.vu_red)
+                peak > -18f -> ContextCompat.getColor(requireContext(), R.color.vu_yellow)
+                else        -> ContextCompat.getColor(requireContext(), R.color.vu_green)
+            }
+        )
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        timerHandler.removeCallbacks(timerRunnable)
         audioEngine.stop()
+        wavWriter?.finish()
+        wavWriter = null
+        videoManager.unbind()
+        _binding = null
     }
 
     companion object {

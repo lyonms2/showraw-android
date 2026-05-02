@@ -14,8 +14,8 @@
     <!-- Upload YouTube -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <uses-feature android:name="android.hardware.camera"          android:required="true" />
-    <uses-feature android:name="android.hardware.microphone"      android:required="true" />
+    <uses-feature android:name="android.hardware.camera"     android:required="true" />
+    <uses-feature android:name="android.hardware.microphone" android:required="true" />
 
     <application
         android:allowBackup="false"
@@ -23,28 +23,40 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ShowRaw">
 
-        <!-- Fase 1: prova de conceito de áudio (sem câmera) -->
+        <!-- Launcher principal (Phase 3+) -->
         <activity
-            android:name=".ui.phase1.Phase1Activity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-
-        <!-- Fase 2: vídeo + áudio processado + exportação MP4 -->
-        <activity
-            android:name=".ui.phase2.Phase2Activity"
+            android:name=".MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!-- Phase 1: prova de conceito de áudio (sem câmera) -->
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.phase1.Phase1Activity"
             android:exported="false"
-            android:screenOrientation="fullSensor"
-            android:windowSoftInputMode="adjustResize" />
+            android:screenOrientation="portrait" />
+
+        <!-- Phase 2: standalone para testes -->
+        <activity
+            android:name=".ui.phase2.Phase2Activity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- FileProvider para partilha de gravações -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 
