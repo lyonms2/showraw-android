@@ -1,12 +1,12 @@
 *.iml
-.gradle
+.gradle/
 /local.properties
 /.idea
 .DS_Store
 /build
 /captures
-.externalNativeBuild
-.cxx
+.externalNativeBuild/
+.cxx/
 *.apk
 *.aar
 *.ap_
@@ -16,6 +16,7 @@
 bin/
 gen/
 out/
+build/
 .navigation/
 proguard/
 *.log
