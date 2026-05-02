@@ -10,6 +10,8 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.nio.ByteBuffer
 
+enum class ExportMode { VIDEO_FINAL, STEMS_WAV, BOTH }
+
 object VideoExporter {
 
     /**
