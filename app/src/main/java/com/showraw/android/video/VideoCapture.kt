@@ -2,20 +2,28 @@ package com.showraw.android.video
 
 import android.content.Context
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.video.FallbackStrategy
+import androidx.camera.video.FileOutputOptions
+import androidx.camera.video.Quality
+import androidx.camera.video.QualitySelector
+import androidx.camera.video.Recorder
+import androidx.camera.video.Recording
+import androidx.camera.video.VideoCapture
+import androidx.camera.video.VideoRecordEvent
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.showraw.android.presets.Preset
 import com.showraw.android.presets.Resolution
+import java.io.File
 
-/**
- * Gerencia o pipeline CameraX.
- * A sincronização com o AudioEngine é feita via timestamps de hardware em VideoExporter.
- */
 class VideoCaptureManager(private val context: Context) {
 
     private var cameraProvider: ProcessCameraProvider? = null
+    private var videoCapture:   VideoCapture<Recorder>? = null
+    private var activeRecording: Recording? = null
 
     fun bindToLifecycle(
         lifecycleOwner: LifecycleOwner,
@@ -23,21 +31,72 @@ class VideoCaptureManager(private val context: Context) {
         preset: Preset,
         onReady: () -> Unit,
     ) {
-        val providerFuture = ProcessCameraProvider.getInstance(context)
-        providerFuture.addListener({
-            cameraProvider = providerFuture.get()
-            // TODO: configurar Preview, VideoCapture e resolver resolução do preset
-            onReady()
+        val future = ProcessCameraProvider.getInstance(context)
+        future.addListener({
+            cameraProvider = future.get()
+
+            val quality = resolveQuality(preset.videoResolution)
+            val recorder = Recorder.Builder()
+                .setQualitySelector(QualitySelector.from(quality, FallbackStrategy.lowerQualityThan(quality)))
+                .build()
+            videoCapture = VideoCapture.withOutput(recorder)
+
+            val preview = Preview.Builder().build().also {
+                it.setSurfaceProvider(previewView.surfaceProvider)
+            }
+
+            try {
+                cameraProvider?.unbindAll()
+                cameraProvider?.bindToLifecycle(
+                    lifecycleOwner,
+                    CameraSelector.DEFAULT_BACK_CAMERA,
+                    preview,
+                    videoCapture,
+                )
+                onReady()
+            } catch (e: Exception) {
+                android.util.Log.e("VideoCaptureManager", "bindToLifecycle falhou", e)
+            }
         }, ContextCompat.getMainExecutor(context))
+    }
+
+    /**
+     * Inicia a gravação de vídeo SEM áudio — o áudio é capturado pelo AudioEngine.
+     * [onStarted] é chamado quando a câmera confirma início; inicie o AudioEngine aqui
+     * para garantir sincronização máxima.
+     */
+    fun startRecording(
+        outputFile: File,
+        onStarted:   () -> Unit,
+        onFinalized: (success: Boolean) -> Unit,
+    ): Boolean {
+        val vc = videoCapture ?: return false
+        val opts = FileOutputOptions.Builder(outputFile).build()
+
+        activeRecording = vc.output
+            .prepareRecording(context, opts)
+            // Sem withAudioEnabled() — áudio é nosso
+            .start(ContextCompat.getMainExecutor(context)) { event ->
+                when (event) {
+                    is VideoRecordEvent.Start    -> onStarted()
+                    is VideoRecordEvent.Finalize -> onFinalized(!event.hasError())
+                    else -> {}
+                }
+            }
+        return true
+    }
+
+    fun stopRecording() {
+        activeRecording?.stop()
+        activeRecording = null
     }
 
     fun unbind() {
         cameraProvider?.unbindAll()
     }
 
-    private fun resolveQuality(resolution: Resolution): androidx.camera.video.Quality =
-        when (resolution) {
-            Resolution.R4K_30, Resolution.R4K_60     -> androidx.camera.video.Quality.UHD
-            Resolution.R1080P_30, Resolution.R1080P_60 -> androidx.camera.video.Quality.FHD
-        }
+    private fun resolveQuality(res: Resolution): Quality = when (res) {
+        Resolution.R4K_30, Resolution.R4K_60       -> Quality.UHD
+        Resolution.R1080P_30, Resolution.R1080P_60 -> Quality.FHD
+    }
 }

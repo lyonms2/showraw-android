@@ -23,9 +23,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ShowRaw">
 
-        <!-- Fase 1: launcher temporário para prova de conceito de áudio -->
+        <!-- Fase 1: prova de conceito de áudio (sem câmera) -->
         <activity
             android:name=".ui.phase1.Phase1Activity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- Fase 2: vídeo + áudio processado + exportação MP4 -->
+        <activity
+            android:name=".ui.phase2.Phase2Activity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
