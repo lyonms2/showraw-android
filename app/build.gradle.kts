@@ -41,10 +41,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
     externalNativeBuild {
         cmake {
             path    = file("src/main/cpp/CMakeLists.txt")
@@ -56,6 +52,10 @@ android {
         viewBinding = true
         prefab = true  // expõe Oboe (e outros AARs com Prefab) ao CMake via find_package()
     }
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 dependencies {
