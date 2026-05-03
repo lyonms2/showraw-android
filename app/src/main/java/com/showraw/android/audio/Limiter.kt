@@ -52,7 +52,7 @@ class Limiter(
             // Amostra futura (lookahead) — usada para calcular gain necessário agora
             val futureL = buffer[i]
             val futureR = buffer[i + 1]
-            val level   = max(abs(futureL), abs(futureR)) / 32768f
+            val level   = max(abs(futureL.toInt()), abs(futureR.toInt())) / 32768f
 
             gainReduction = if (level > thr) {
                 val target = thr / level

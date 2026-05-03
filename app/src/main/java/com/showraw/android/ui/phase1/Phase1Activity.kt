@@ -69,6 +69,7 @@ class Phase1Activity : AppCompatActivity() {
             binding.tvHwResult.text = when (result) {
                 HardwareValidationResult.RAW_CONFIRMED     -> "✅ Modo RAW confirmado neste aparelho"
                 HardwareValidationResult.RAW_UNCONFIRMED   -> "⚠️ Modo RAW não confirmado. O áudio pode conter processamento nativo. Recomendamos microfone externo."
+                HardwareValidationResult.AMBIENT_TOO_QUIET -> "🔇 Ambiente silencioso demais. Reproduza música ou fale perto do microfone e tente novamente."
                 HardwareValidationResult.PERMISSION_DENIED -> "❌ Permissão de microfone negada."
                 HardwareValidationResult.ERROR             -> "❌ Erro na validação de hardware."
             }
