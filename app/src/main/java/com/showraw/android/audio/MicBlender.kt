@@ -36,9 +36,10 @@ class MicBlender(private val sensorManager: SensorManager) : SensorEventListener
     /** Chamado a cada ~50ms com o RMS atual do buffer de áudio. */
     fun feedRms(rms: Float) {
         val now  = System.currentTimeMillis()
-        val drop = lastRms > 0f && rms < lastRms * 0.5f && (now - lastRmsTimestamp) < 100
-        if (drop) {
-            // Queda de > 6dB em < 100ms — possível null point
+        // Queda brusca de >6dB em <100ms com celular em orientação problemática → dispara aviso
+        val drop = lastRms > 0.01f && rms < lastRms * 0.5f && (now - lastRmsTimestamp) < 100
+        if (drop && currentOrientation == MicOrientation.REAR) {
+            onOrientationChanged?.invoke(MicOrientation.REAR)
         }
         lastRms = rms
         lastRmsTimestamp = now
@@ -46,10 +47,16 @@ class MicBlender(private val sensorManager: SensorManager) : SensorEventListener
 
     override fun onSensorChanged(event: SensorEvent) {
         if (event.sensor.type != Sensor.TYPE_ACCELEROMETER) return
-        val (x, _, z) = event.values
+        val x = event.values[0]
+        val y = event.values[1]
+        // Eixo Y: +9.8 = portrait normal (mic embaixo, apontando para frente)
+        //         -9.8 = portrait invertido (mic em cima, null point)
+        // Eixo X: usado para landscape quando Y está perto de zero
         val orientation = when {
-            z > 7f  -> MicOrientation.FRONT  // Face up / normal portrait
-            z < -7f -> MicOrientation.REAR   // Face down / rotated
+            y > 7f  -> MicOrientation.FRONT   // Portrait normal
+            y < -7f -> MicOrientation.REAR    // Portrait invertido — null point provável
+            x < -7f -> MicOrientation.FRONT   // Landscape esquerda
+            x > 7f  -> MicOrientation.REAR    // Landscape direita
             else    -> MicOrientation.UNKNOWN
         }
         if (orientation != currentOrientation) {
