@@ -1,6 +1,7 @@
 package com.showraw.android.video
 
 import android.content.Context
+import android.view.Surface
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -35,15 +36,24 @@ class VideoCaptureManager(private val context: Context) {
         future.addListener({
             cameraProvider = future.get()
 
+            // Rotação atual do display — necessária para que o MP4 grave com a
+            // orientação correta. Sem isso, o sensor da câmera traseira (90° físico)
+            // grava sempre em paisagem independente de como o celular está segurado.
+            val rotation = previewView.display?.rotation ?: Surface.ROTATION_0
+
             val quality = resolveQuality(preset.videoResolution)
             val recorder = Recorder.Builder()
                 .setQualitySelector(QualitySelector.from(quality, FallbackStrategy.lowerQualityThan(quality)))
                 .build()
-            videoCapture = VideoCapture.withOutput(recorder)
+            videoCapture = VideoCapture.Builder(recorder)
+                .setTargetRotation(rotation)
+                .build()
 
-            val preview = Preview.Builder().build().also {
-                it.setSurfaceProvider(previewView.surfaceProvider)
-            }
+            val preview = Preview.Builder()
+                .setTargetRotation(rotation)
+                .build().also {
+                    it.setSurfaceProvider(previewView.surfaceProvider)
+                }
 
             try {
                 cameraProvider?.unbindAll()
