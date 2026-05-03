@@ -4,8 +4,10 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
+import android.os.StatFs
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,12 +46,19 @@ class RecordingFragment : Fragment() {
     private var pendingWavFile: File? = null
     private var isRecording = false
     private var recordStart = 0L
+    private var freeMbAtStart = 0L
 
     private val timerHandler = Handler(Looper.getMainLooper())
     private val timerRunnable = object : Runnable {
         override fun run() {
             val secs = (System.currentTimeMillis() - recordStart) / 1000
             _binding?.tvTimer?.text = "%02d:%02d".format(secs / 60, secs % 60)
+
+            // Tempo restante = capacidade total estimada - tempo já gravado
+            val totalSecs = freeMbAtStart * 60L / preset.estimatedMbPerMin
+            val remainSecs = (totalSecs - secs).coerceAtLeast(0L)
+            _binding?.tvTimeRemaining?.text = "−%02d:%02d".format(remainSecs / 60, remainSecs % 60)
+
             timerHandler.postDelayed(this, 1_000)
         }
     }
@@ -85,9 +94,18 @@ class RecordingFragment : Fragment() {
         binding.tvPresetName.text = "${preset.emoji} ${preset.name}"
 
         audioEngine.onStats      = { stats -> activity?.runOnUiThread { updateStats(stats) } }
-        audioEngine.onSplWarning = { activity?.runOnUiThread { _binding?.tvSplWarning?.visibility = View.VISIBLE } }
+        audioEngine.onSplWarning = { activity?.runOnUiThread { _binding?.overlaySpl?.visibility = View.VISIBLE } }
 
         binding.btnStop.setOnClickListener { stopRecording() }
+        binding.btnSplContinue.setOnClickListener { binding.overlaySpl.visibility = View.GONE }
+        binding.btnSplMic.setOnClickListener {
+            binding.overlaySpl.visibility = View.GONE
+            Toast.makeText(requireContext(), "Conecte o microfone externo e reinicie a gravação.", Toast.LENGTH_LONG).show()
+        }
+        binding.btnSplStop.setOnClickListener {
+            binding.overlaySpl.visibility = View.GONE
+            stopRecording()
+        }
 
         checkAndRequestPermissions()
     }
@@ -119,10 +137,12 @@ class RecordingFragment : Fragment() {
 
                 isRecording = true
                 recordStart = System.currentTimeMillis()
+                freeMbAtStart = getFreeStorageMb()
                 timerHandler.post(timerRunnable)
 
                 _binding?.tvRecDot?.visibility = View.VISIBLE
-                _binding?.tvSplWarning?.visibility = View.GONE
+                _binding?.tvTimeRemaining?.visibility = View.VISIBLE
+                _binding?.overlaySpl?.visibility = View.GONE
                 _binding?.btnStop?.isEnabled = true
             },
             onFinalized = { success ->
@@ -148,10 +168,18 @@ class RecordingFragment : Fragment() {
         isRecording = false
 
         binding.tvRecDot.visibility = View.GONE
+        binding.tvTimeRemaining.visibility = View.GONE
         binding.btnStop.isEnabled = false
         binding.overlayFinalizing.visibility = View.VISIBLE
 
         videoManager.stopRecording()
+    }
+
+    private fun getFreeStorageMb(): Long {
+        val path = requireContext().getExternalFilesDir(null)?.absolutePath
+            ?: Environment.getExternalStorageDirectory().absolutePath
+        val stat = StatFs(path)
+        return stat.availableBlocksLong * stat.blockSizeLong / (1024L * 1024L)
     }
 
     private fun updateStats(stats: AudioStats) {
