@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_main"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🎛️ Manual (Pro)"
+            android:textColor="@color/primary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="24dp"
+            android:text="Configure cada parâmetro manualmente. Os valores são salvos automaticamente."
+            android:textColor="#999999"
+            android:textSize="12sp" />
+
+        <!-- ── LIMITER ─────────────────────────────────────── -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="LIMITER"
+            android:textColor="#999999"
+            android:textSize="11sp"
+            android:letterSpacing="0.12"
+            android:layout_marginBottom="14dp" />
+
+        <!-- Threshold -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Threshold"
+                android:textColor="@color/white"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tv_threshold_val"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-6 dBFS"
+                android:textColor="@color/primary"
+                android:textSize="13sp"
+                android:fontFamily="monospace" />
+
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/sb_threshold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="16dp"
+            android:max="19"
+            android:progressTint="@color/primary"
+            android:thumbTint="@color/primary" />
+
+        <!-- Attack -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Attack"
+                android:textColor="@color/white"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tv_attack_val"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5 ms"
+                android:textColor="@color/primary"
+                android:textSize="13sp"
+                android:fontFamily="monospace" />
+
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/sb_attack"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="16dp"
+            android:max="49"
+            android:progressTint="@color/primary"
+            android:thumbTint="@color/primary" />
+
+        <!-- Release -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Release"
+                android:textColor="@color/white"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tv_release_val"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="80 ms"
+                android:textColor="@color/primary"
+                android:textSize="13sp"
+                android:fontFamily="monospace" />
+
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/sb_release"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:max="480"
+            android:progressTint="@color/primary"
+            android:thumbTint="@color/primary" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="Dica: release longo (&gt; 150ms) soa mais natural em shows. Release curto (&lt; 50ms) pode causar bombeamento."
+            android:textColor="#666666"
+            android:textSize="11sp"
+            android:lineSpacingMultiplier="1.3" />
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#2A2A2A"
+            android:layout_marginBottom="20dp" />
+
+        <!-- ── FILTRO HIGH-PASS ────────────────────────────── -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="FILTRO HIGH-PASS"
+            android:textColor="#999999"
+            android:textSize="11sp"
+            android:letterSpacing="0.12"
+            android:layout_marginBottom="14dp" />
+
+        <!-- HPF Frequency -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Frequência de corte"
+                android:textColor="@color/white"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tv_hpf_freq_val"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="120 Hz"
+                android:textColor="@color/primary"
+                android:textSize="13sp"
+                android:fontFamily="monospace" />
+
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/sb_hpf_freq"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:max="170"
+            android:progressTint="@color/primary"
+            android:thumbTint="@color/primary" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="80 Hz"
+            android:textColor="#444444"
+            android:textSize="10sp" />
+
+        <!-- HPF Rolloff selection -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rolloff"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            android:layout_marginBottom="8dp" />
+
+        <RadioGroup
+            android:id="@+id/rg_rolloff"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <RadioButton
+                android:id="@+id/rb_rolloff_12"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="12 dB/oct"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:buttonTint="@color/primary" />
+
+            <RadioButton
+                android:id="@+id/rb_rolloff_18"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true"
+                android:text="18 dB/oct"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:buttonTint="@color/primary" />
+
+            <RadioButton
+                android:id="@+id/rb_rolloff_24"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="24 dB/oct"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:buttonTint="@color/primary" />
+
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="12 dB/oct → mais suave, preserva corpo. 18 dB/oct → equilíbrio. 24 dB/oct → corte agressivo para vento forte."
+            android:textColor="#666666"
+            android:textSize="11sp"
+            android:lineSpacingMultiplier="1.3" />
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#2A2A2A"
+            android:layout_marginBottom="20dp" />
+
+        <!-- ── VÍDEO ───────────────────────────────────────── -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="VÍDEO"
+            android:textColor="#999999"
+            android:textSize="11sp"
+            android:letterSpacing="0.12"
+            android:layout_marginBottom="14dp" />
+
+        <RadioGroup
+            android:id="@+id/rg_resolution"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="8dp">
+
+            <RadioButton
+                android:id="@+id/rb_res_4k30"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:checked="true"
+                android:text="4K / 30fps  (~350 MB/min)"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:buttonTint="@color/primary" />
+
+            <RadioButton
+                android:id="@+id/rb_res_4k60"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:text="4K / 60fps  (~600 MB/min)  — movimento rápido"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:buttonTint="@color/primary" />
+
+            <RadioButton
+                android:id="@+id/rb_res_1080p30"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:text="1080p / 30fps  (~130 MB/min)  — economiza espaço"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:buttonTint="@color/primary" />
+
+            <RadioButton
+                android:id="@+id/rb_res_1080p60"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:text="1080p / 60fps  (~200 MB/min)"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:buttonTint="@color/primary" />
+
+        </RadioGroup>
+
+        <!-- Gravar button -->
+        <Button
+            android:id="@+id/btn_record_manual"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/primary"
+            android:text="● Gravar"
+            android:textColor="@color/bg_main"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

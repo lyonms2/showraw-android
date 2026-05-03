@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.showraw.android.ui.export.ExportFragment
 import com.showraw.android.ui.presets.PresetsFragment
 import com.showraw.android.ui.recording.RecordingFragment
+import com.showraw.android.ui.settings.SettingsFragment
 
 class MainActivity : AppCompatActivity(), Navigator {
 
@@ -35,5 +36,12 @@ class MainActivity : AppCompatActivity(), Navigator {
 
     override fun newRecording() {
         supportFragmentManager.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
+    }
+
+    override fun showProSettings() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, SettingsFragment())
+            .addToBackStack("settings")
+            .commit()
     }
 }

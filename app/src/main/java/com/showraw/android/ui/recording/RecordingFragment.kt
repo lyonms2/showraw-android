@@ -24,6 +24,7 @@ import com.showraw.android.audio.WavWriter
 import com.showraw.android.databinding.FragmentRecordingBinding
 import com.showraw.android.presets.Preset
 import com.showraw.android.presets.PresetRepository
+import com.showraw.android.ui.settings.SettingsFragment
 import com.showraw.android.video.VideoCaptureManager
 import java.io.File
 import java.text.SimpleDateFormat
@@ -66,7 +67,11 @@ class RecordingFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val presetId = arguments?.getString(ARG_PRESET_ID) ?: "show"
-        preset = PresetRepository.findById(presetId) ?: PresetRepository.all.first()
+        preset = if (presetId == "manual") {
+            SettingsFragment.loadManualPreset(requireContext())
+        } else {
+            PresetRepository.findById(presetId) ?: PresetRepository.all.first()
+        }
         audioEngine.configure(preset)
 
         permLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { perms ->
