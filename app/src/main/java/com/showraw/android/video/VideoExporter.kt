@@ -31,6 +31,7 @@ object VideoExporter {
         videoFile:  File,
         wavFile:    File,
         outputFile: File,
+        location:   android.location.Location? = null,
         onProgress: (Float) -> Unit = {},
     ): ExportResult = withContext(Dispatchers.IO) {
 
@@ -69,6 +70,7 @@ object VideoExporter {
         val muxer  = MediaMuxer(outputFile.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
         val vTrack = muxer.addTrack(videoFormat)
         val aTrack = muxer.addTrack(audioFormat)
+        location?.let { muxer.setLocation(it.latitude.toFloat(), it.longitude.toFloat()) }
         muxer.start()
 
         val buf  = ByteBuffer.allocate(1024 * 1024)

@@ -55,6 +55,10 @@ class PresetsFragment : Fragment() {
         binding.btnLibrary.setOnClickListener {
             (requireActivity() as? Navigator)?.showLibrary()
         }
+
+        binding.btnManual.setOnClickListener {
+            (requireActivity() as? Navigator)?.showManual()
+        }
     }
 
     private fun updateSummary(preset: Preset) {

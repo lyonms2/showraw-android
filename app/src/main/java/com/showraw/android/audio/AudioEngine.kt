@@ -1,7 +1,9 @@
 package com.showraw.android.audio
 
+import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioRecord
+import android.media.AudioTrack
 import android.media.MediaRecorder
 import android.os.Process
 import com.showraw.android.presets.Preset
@@ -42,6 +44,9 @@ class AudioEngine {
     private var captureJob: Job?       = null
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+    private var monitorTrack: AudioTrack? = null
+    @Volatile private var monitoringEnabled = false
+
     private val hpf       = HighPassFilter()
     private val equalizer = Equalizer()
     private val noiseGate = NoiseGate()
@@ -65,11 +70,22 @@ class AudioEngine {
         limiter.configure(preset.limiterThreshold, preset.limiterAttack, preset.limiterRelease)
     }
 
+    fun enableMonitoring(enable: Boolean) {
+        monitoringEnabled = enable
+        if (enable) {
+            monitorTrack?.play()
+        } else {
+            monitorTrack?.pause()
+            monitorTrack?.flush()
+        }
+    }
+
     fun start() {
         val bufSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_CFG, ENCODING)
             .coerceAtLeast(1024 * 2 * 2)  // mínimo 1024 samples, estéreo, 16bit
 
         recorder = createAudioRecord(bufSize).also { it.startRecording() }
+        monitorTrack = createMonitorTrack()
 
         val buffer = ShortArray(bufSize / 2)
 
@@ -84,6 +100,8 @@ class AudioEngine {
                 equalizer.processBuffer(buffer, read)
                 noiseGate.processBuffer(buffer, read)
                 limiter.processBuffer(buffer, read)
+
+                if (monitoringEnabled) monitorTrack?.write(buffer, 0, read)
 
                 val rms  = MicBlender.computeRms(buffer, read)
                 val peak = computePeakDbFs(buffer, read)
@@ -126,11 +144,36 @@ class AudioEngine {
 
     fun stop() {
         paused = false
+        monitoringEnabled = false
         captureJob?.cancel()
         captureJob = null
         recorder?.stop()
         recorder?.release()
         recorder = null
+        monitorTrack?.stop()
+        monitorTrack?.release()
+        monitorTrack = null
+    }
+
+    private fun createMonitorTrack(): AudioTrack {
+        val minBuf = AudioTrack.getMinBufferSize(SAMPLE_RATE, AudioFormat.CHANNEL_OUT_STEREO, ENCODING)
+        return AudioTrack.Builder()
+            .setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build()
+            )
+            .setAudioFormat(
+                AudioFormat.Builder()
+                    .setSampleRate(SAMPLE_RATE)
+                    .setChannelMask(AudioFormat.CHANNEL_OUT_STEREO)
+                    .setEncoding(ENCODING)
+                    .build()
+            )
+            .setBufferSizeInBytes(minBuf)
+            .setTransferMode(AudioTrack.MODE_STREAM)
+            .build()
     }
 
     private fun computePeakDbFs(buffer: ShortArray, size: Int): Float {

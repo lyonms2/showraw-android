@@ -6,4 +6,5 @@ interface Navigator {
     fun newRecording()
     fun showProSettings()
     fun showLibrary()
+    fun showManual()
 }

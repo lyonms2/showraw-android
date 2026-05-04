@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.showraw.android.ui.export.ExportFragment
 import com.showraw.android.ui.library.LibraryFragment
+import com.showraw.android.ui.manual.ManualFragment
 import com.showraw.android.ui.presets.PresetsFragment
 import com.showraw.android.ui.recording.RecordingFragment
 import com.showraw.android.ui.settings.SettingsFragment
@@ -50,6 +51,13 @@ class MainActivity : AppCompatActivity(), Navigator {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, LibraryFragment())
             .addToBackStack("library")
+            .commit()
+    }
+
+    override fun showManual() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, ManualFragment())
+            .addToBackStack("manual")
             .commit()
     }
 }

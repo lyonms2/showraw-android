@@ -19,6 +19,21 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <Button
+        android:id="@+id/btn_manual"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="16dp"
+        android:backgroundTint="@color/bg_card"
+        android:text="?"
+        android:textColor="@color/primary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:padding="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <TextView
         android:id="@+id/tv_slogan"
         android:layout_width="0dp"

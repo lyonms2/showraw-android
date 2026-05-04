@@ -97,6 +97,23 @@
 
     </LinearLayout>
 
+    <!-- Headphone monitoring button — top-right, third from right -->
+    <Button
+        android:id="@+id/btn_monitoring"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:backgroundTint="#80000000"
+        android:text="🎧"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:padding="0dp"
+        android:enabled="false"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/vu_bar"
+        app:layout_constraintEnd_toStartOf="@id/btn_stabilization" />
+
     <!-- EIS toggle button — top-right, second from right -->
     <Button
         android:id="@+id/btn_stabilization"

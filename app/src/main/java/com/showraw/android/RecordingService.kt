@@ -79,7 +79,7 @@ class RecordingService : Service() {
     private fun buildNotification(isPaused: Boolean, elapsed: String): Notification {
         val title = if (isPaused) "⏸ Gravação pausada" else "● Gravando"
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_btn_speak_now)
+            .setSmallIcon(R.drawable.ic_rec_notification)
             .setContentTitle(title)
             .setContentText(elapsed)
             .setOngoing(true)

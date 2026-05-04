@@ -1,12 +1,18 @@
 package com.showraw.android.ui.export
 
+import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import com.showraw.android.Navigator
@@ -51,18 +57,29 @@ class ExportFragment : Fragment() {
         }
         binding.btnShareVideo.setOnClickListener { shareFile(exportResult?.videoMp4, "video/mp4") }
         binding.btnShareAudio.setOnClickListener { shareFile(exportResult?.audioM4a, "audio/mp4") }
+        binding.btnShareYoutube.setOnClickListener { shareToYouTube(exportResult?.videoMp4) }
 
-        startExport(File(videoPath), File(wavPath), sessionName)
+        val location = getLastKnownLocation()
+        startExport(File(videoPath), File(wavPath), sessionName, location)
     }
 
-    private fun startExport(videoFile: File, wavFile: File, sessionName: String) {
+    private fun getLastKnownLocation(): Location? {
+        val hasFine   = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)   == PackageManager.PERMISSION_GRANTED
+        val hasCoarse = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        if (!hasFine && !hasCoarse) return null
+        val lm = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return lm.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            ?: lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+    }
+
+    private fun startExport(videoFile: File, wavFile: File, sessionName: String, location: Location? = null) {
         val ts     = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
         val prefix = if (sessionName.isNotEmpty()) sessionName.replace(Regex("[^a-zA-Z0-9_\\-]"), "_").take(40) else "showraw"
         val out    = File(requireContext().getExternalFilesDir(null), "${prefix}_$ts.mp4")
 
         scope.launch {
             try {
-                val result = VideoExporter.mux(videoFile, wavFile, out) { progress ->
+                val result = VideoExporter.mux(videoFile, wavFile, out, location) { progress ->
                     activity?.runOnUiThread {
                         binding.exportProgress.progress = (progress * 100).toInt()
                         binding.tvExportStatus.text = when {
@@ -97,9 +114,10 @@ class ExportFragment : Fragment() {
                         binding.ivThumbnail.setImageBitmap(thumb)
                         binding.ivThumbnail.setOnClickListener { playVideo(result.videoMp4) }
                     }
-                    binding.resultCard.visibility      = View.VISIBLE
-                    binding.btnShareRow.visibility     = View.VISIBLE
-                    binding.btnNewRecording.visibility = View.VISIBLE
+                    binding.resultCard.visibility        = View.VISIBLE
+                    binding.btnShareRow.visibility       = View.VISIBLE
+                    binding.btnShareYoutube.visibility   = View.VISIBLE
+                    binding.btnNewRecording.visibility   = View.VISIBLE
                 }
 
             } catch (e: Exception) {
@@ -108,6 +126,28 @@ class ExportFragment : Fragment() {
                     binding.btnNewRecording.visibility = View.VISIBLE
                 }
             }
+        }
+    }
+
+    private fun shareToYouTube(file: File?) {
+        file ?: return
+        val uri = FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.provider", file)
+        val youtubeIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "video/mp4"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            setPackage("com.google.android.youtube")
+        }
+        if (youtubeIntent.resolveActivity(requireContext().packageManager) != null) {
+            startActivity(youtubeIntent)
+        } else {
+            startActivity(Intent.createChooser(
+                Intent(Intent.ACTION_SEND).apply {
+                    type = "video/mp4"
+                    putExtra(Intent.EXTRA_STREAM, uri)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }, "Enviar vídeo"
+            ))
         }
     }
 

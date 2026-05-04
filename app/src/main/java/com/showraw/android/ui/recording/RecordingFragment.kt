@@ -58,6 +58,7 @@ class RecordingFragment : Fragment() {
     private var pendingWavFile: File? = null
     private var sessionName = ""
     private var stabilizationEnabled = false
+    private var monitoringEnabled = false
     private var isRecording = false
     private var currentUiRotation = 0f
     private var isPaused    = false
@@ -172,6 +173,7 @@ class RecordingFragment : Fragment() {
         binding.btnPause.setOnClickListener { togglePause() }
         binding.btnFlipCamera.setOnClickListener { flipCamera() }
         binding.btnStabilization.setOnClickListener { toggleStabilization() }
+        binding.btnMonitoring.setOnClickListener { toggleMonitoring() }
 
         binding.btnSplContinue.setOnClickListener { binding.overlaySpl.visibility = View.GONE }
         binding.btnSplMic.setOnClickListener {
@@ -312,6 +314,8 @@ class RecordingFragment : Fragment() {
                 _binding?.btnPause?.isEnabled            = true
                 _binding?.btnFlipCamera?.isEnabled       = false
                 _binding?.btnStabilization?.isEnabled    = false
+                _binding?.btnMonitoring?.visibility      = View.VISIBLE
+                _binding?.btnMonitoring?.isEnabled       = true
             },
             onFinalized = { success ->
                 _binding?.overlayFinalizing?.visibility = View.GONE
@@ -367,15 +371,18 @@ class RecordingFragment : Fragment() {
             it.action = RecordingService.ACTION_STOP
         })
 
-        binding.tvRecDot.visibility       = View.GONE
-        binding.tvTimeRemaining.visibility = View.GONE
-        binding.tvZoomLevel.visibility    = View.GONE
-        binding.waveformView.visibility   = View.GONE
-        binding.exposureRow.visibility    = View.GONE
-        binding.btnStop.isEnabled         = false
-        binding.btnStop.text              = "■ Parar"
-        binding.btnPause.isEnabled        = false
-        binding.btnPause.text             = "⏸ Pausar"
+        binding.tvRecDot.visibility        = View.GONE
+        binding.tvTimeRemaining.visibility  = View.GONE
+        binding.tvZoomLevel.visibility     = View.GONE
+        binding.waveformView.visibility    = View.GONE
+        binding.exposureRow.visibility     = View.GONE
+        binding.btnStop.isEnabled          = false
+        binding.btnStop.text               = "■ Parar"
+        binding.btnPause.isEnabled         = false
+        binding.btnPause.text              = "⏸ Pausar"
+        binding.btnMonitoring.isEnabled    = false
+        binding.btnMonitoring.visibility   = View.GONE
+        monitoringEnabled = false
         binding.overlayFinalizing.visibility = View.VISIBLE
 
         videoManager.stopRecording()
@@ -435,6 +442,7 @@ class RecordingFragment : Fragment() {
             _binding?.btnPause,
             _binding?.btnFlipCamera,
             _binding?.btnStabilization,
+            _binding?.btnMonitoring,
             _binding?.tvRecDot,
             _binding?.tvZoomLevel,
         ).forEach { v ->
@@ -444,6 +452,19 @@ class RecordingFragment : Fragment() {
                 .setInterpolator(android.view.animation.DecelerateInterpolator())
                 .start()
         }
+    }
+
+    private fun toggleMonitoring() {
+        monitoringEnabled = !monitoringEnabled
+        audioEngine.enableMonitoring(monitoringEnabled)
+        binding.btnMonitoring.backgroundTintList = android.content.res.ColorStateList.valueOf(
+            if (monitoringEnabled) android.graphics.Color.parseColor("#EF9F27")
+            else android.graphics.Color.parseColor("#80000000")
+        )
+        binding.btnMonitoring.setTextColor(
+            if (monitoringEnabled) android.graphics.Color.parseColor("#0D0D0D")
+            else android.graphics.Color.WHITE
+        )
     }
 
     private fun toggleStabilization() {
