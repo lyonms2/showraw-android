@@ -63,13 +63,15 @@ object VideoExporter {
         }
 
         val videoFormat = videoExtractor.getTrackFormat(videoTrackIdx)
-        if (srcRotation != 0) videoFormat.setInteger(MediaFormat.KEY_ROTATION, srcRotation)
         val audioFormat = audioExtractor.getTrackFormat(0)
 
         // ── Passo 3: mux ─────────────────────────────────────────────
         val muxer  = MediaMuxer(outputFile.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
         val vTrack = muxer.addTrack(videoFormat)
         val aTrack = muxer.addTrack(audioFormat)
+        // setOrientationHint escreve a rotação no cabeçalho do container MP4 (tkhd box),
+        // que é o que players leem. MediaFormat.KEY_ROTATION na trilha é ignorado pelo MediaMuxer.
+        muxer.setOrientationHint(srcRotation)
         location?.let { muxer.setLocation(it.latitude.toFloat(), it.longitude.toFloat()) }
         muxer.start()
 
