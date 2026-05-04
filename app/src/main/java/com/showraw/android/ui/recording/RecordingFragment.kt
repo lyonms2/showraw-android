@@ -457,6 +457,11 @@ class RecordingFragment : Fragment() {
     private fun toggleMonitoring() {
         monitoringEnabled = !monitoringEnabled
         audioEngine.enableMonitoring(monitoringEnabled)
+        if (monitoringEnabled) {
+            Toast.makeText(requireContext(),
+                "Monitoramento ativo — pode haver latência de 50–200ms dependendo do dispositivo.",
+                Toast.LENGTH_LONG).show()
+        }
         binding.btnMonitoring.backgroundTintList = android.content.res.ColorStateList.valueOf(
             if (monitoringEnabled) android.graphics.Color.parseColor("#EF9F27")
             else android.graphics.Color.parseColor("#80000000")

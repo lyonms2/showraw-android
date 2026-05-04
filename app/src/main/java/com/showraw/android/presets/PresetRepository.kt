@@ -3,6 +3,7 @@ package com.showraw.android.presets
 object PresetRepository {
 
     val all: List<Preset> = listOf(
+
         Preset(
             id = "show", name = "Show / Concerto", emoji = "🎸",
             description = "Ambientes de show com volume alto. Limiter agressivo, HPF 120Hz.",
@@ -11,8 +12,14 @@ object PresetRepository {
             videoResolution = Resolution.R4K_30, estimatedMbPerMin = 350,
             contextualWarning = null,
             stabilization = true,
-            inputGainDb = 18f,  // mic longe do palco + sem AGC
+            // DSP
+            inputGainDb = 12f,
+            noiseGateThreshold = -45f,
+            eqLowGainDb = 0f, eqMidGainDb = -2f, eqHighGainDb = 3f,
+            compressorThreshold = -20f, compressorRatio = 4f,
+            compressorAttack = 10f, compressorRelease = 100f, compressorMakeupDb = 8f,
         ),
+
         Preset(
             id = "sport", name = "Esporte / Estádio", emoji = "🏟️",
             description = "Multidões, torcida, arquibancada. Alta taxa de quadros para movimento.",
@@ -21,8 +28,14 @@ object PresetRepository {
             videoResolution = Resolution.R4K_60, estimatedMbPerMin = 600,
             contextualWarning = "Gera ~600 MB/min. Verifique o espaço disponível.",
             stabilization = true,
-            inputGainDb = 18f,
+            // DSP
+            inputGainDb = 12f,
+            noiseGateThreshold = -45f,
+            eqLowGainDb = 0f, eqMidGainDb = -1f, eqHighGainDb = 2f,
+            compressorThreshold = -20f, compressorRatio = 4f,
+            compressorAttack = 10f, compressorRelease = 100f, compressorMakeupDb = 8f,
         ),
+
         Preset(
             id = "outdoor", name = "Ao ar livre", emoji = "🌳",
             description = "Parques, ruas, festivais. HPF mais alto para cortar vento.",
@@ -31,8 +44,14 @@ object PresetRepository {
             videoResolution = Resolution.R4K_30, estimatedMbPerMin = 350,
             contextualWarning = "Otimizado para voz com vento. Para instrumentos, use Ambiente interno.",
             stabilization = true,
+            // DSP
             inputGainDb = 12f,
+            noiseGateThreshold = -40f,
+            eqLowGainDb = 0f, eqMidGainDb = 0f, eqHighGainDb = -2f,
+            compressorThreshold = -20f, compressorRatio = 3f,
+            compressorAttack = 15f, compressorRelease = 120f, compressorMakeupDb = 6f,
         ),
+
         Preset(
             id = "vlog", name = "Vlog / Rua", emoji = "📱",
             description = "Conteúdo de rua, fala próxima ao celular. Rolloff suave.",
@@ -41,8 +60,14 @@ object PresetRepository {
             videoResolution = Resolution.R4K_30, estimatedMbPerMin = 350,
             contextualWarning = null,
             stabilization = true,
-            inputGainDb = 9f,   // celular próximo da voz
+            // DSP
+            inputGainDb = 9f,
+            noiseGateThreshold = -35f,
+            eqLowGainDb = 0f, eqMidGainDb = 2f, eqHighGainDb = 1f,
+            compressorThreshold = -18f, compressorRatio = 2.5f,
+            compressorAttack = 20f, compressorRelease = 150f, compressorMakeupDb = 4f,
         ),
+
         Preset(
             id = "indoor", name = "Ambiente interno", emoji = "🏠",
             description = "Acústica fechada, reverberação natural. HPF suave para preservar graves.",
@@ -50,8 +75,14 @@ object PresetRepository {
             hpfFrequency = 80f, hpfRolloff = 12,
             videoResolution = Resolution.R4K_30, estimatedMbPerMin = 350,
             contextualWarning = null,
+            // DSP
             inputGainDb = 9f,
+            noiseGateThreshold = -40f,
+            eqLowGainDb = 1f, eqMidGainDb = 0f, eqHighGainDb = 0f,
+            compressorThreshold = -20f, compressorRatio = 2f,
+            compressorAttack = 20f, compressorRelease = 200f, compressorMakeupDb = 4f,
         ),
+
         Preset(
             id = "bar", name = "Bar / Restaurante", emoji = "🍺",
             description = "Ambiente com ruído de fundo moderado. 1080p para economizar espaço.",
@@ -59,8 +90,14 @@ object PresetRepository {
             hpfFrequency = 100f, hpfRolloff = 18,
             videoResolution = Resolution.R1080P_30, estimatedMbPerMin = 130,
             contextualWarning = "Vídeo em 1080p para economizar espaço.",
+            // DSP
             inputGainDb = 12f,
+            noiseGateThreshold = -40f,
+            eqLowGainDb = 0f, eqMidGainDb = -1f, eqHighGainDb = 2f,
+            compressorThreshold = -18f, compressorRatio = 3f,
+            compressorAttack = 15f, compressorRelease = 120f, compressorMakeupDb = 6f,
         ),
+
         Preset(
             id = "talk", name = "Palestra / Evento", emoji = "🎤",
             description = "Voz humana predominante. Limiter gentil, graves preservados.",
@@ -68,8 +105,14 @@ object PresetRepository {
             hpfFrequency = 80f, hpfRolloff = 12,
             videoResolution = Resolution.R1080P_30, estimatedMbPerMin = 130,
             contextualWarning = null,
+            // DSP
             inputGainDb = 9f,
+            noiseGateThreshold = -35f,
+            eqLowGainDb = -1f, eqMidGainDb = 3f, eqHighGainDb = 1f,
+            compressorThreshold = -20f, compressorRatio = 2f,
+            compressorAttack = 25f, compressorRelease = 200f, compressorMakeupDb = 4f,
         ),
+
         Preset(
             id = "manual", name = "Manual (Pro)", emoji = "🎛️",
             description = "Controle total sobre todos os parâmetros de áudio e vídeo.",
@@ -77,7 +120,12 @@ object PresetRepository {
             hpfFrequency = 120f, hpfRolloff = 18,
             videoResolution = Resolution.R4K_30, estimatedMbPerMin = 350,
             contextualWarning = null,
-            inputGainDb = 0f,   // usuário define manualmente
+            // DSP — valores neutros, usuário define em Ajustes Avançados
+            inputGainDb = 0f,
+            noiseGateThreshold = -60f,
+            eqLowGainDb = 0f, eqMidGainDb = 0f, eqHighGainDb = 0f,
+            compressorThreshold = -18f, compressorRatio = 3f,
+            compressorAttack = 20f, compressorRelease = 150f, compressorMakeupDb = 6f,
         ),
     )
 

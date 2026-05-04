@@ -29,6 +29,12 @@ data class Preset(
     val stabilization: Boolean     = false,
     // Ganho de entrada (compensa ausência de AGC ao usar UNPROCESSED)
     val inputGainDb: Float         = 6f,    // dB aplicados antes do HPF
+    // Compressor (entre EQ e Limiter)
+    val compressorThreshold: Float = -18f,  // dBFS
+    val compressorRatio: Float     = 3f,    // ex: 3f = 3:1
+    val compressorAttack: Float    = 20f,   // ms
+    val compressorRelease: Float   = 150f,  // ms
+    val compressorMakeupDb: Float  = 6f,    // dB de makeup gain
     // Gravação
     val maxDurationMinutes: Int    = 0,     // 0 = ilimitado
 )

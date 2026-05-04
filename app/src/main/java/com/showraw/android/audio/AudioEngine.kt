@@ -49,10 +49,11 @@ class AudioEngine {
     @Volatile private var monitoringEnabled = false
     @Volatile private var preGainFactor = 1f
 
-    private val hpf       = HighPassFilter()
-    private val equalizer = Equalizer()
-    private val noiseGate = NoiseGate()
-    private val limiter   = Limiter()
+    private val hpf        = HighPassFilter()
+    private val equalizer  = Equalizer()
+    private val noiseGate  = NoiseGate()
+    private val compressor = Compressor()
+    private val limiter    = Limiter()
 
     var onBufferReady: ((ShortArray, Int) -> Unit)? = null
     var onStats:       ((AudioStats)      -> Unit)? = null
@@ -70,6 +71,13 @@ class AudioEngine {
             highGainDb = preset.eqHighGainDb,
         )
         noiseGate.configure(preset.noiseGateThreshold)
+        compressor.configure(
+            thresholdDb  = preset.compressorThreshold,
+            ratio        = preset.compressorRatio,
+            attackMs     = preset.compressorAttack,
+            releaseMs    = preset.compressorRelease,
+            makeupGainDb = preset.compressorMakeupDb,
+        )
         limiter.configure(preset.limiterThreshold, preset.limiterAttack, preset.limiterRelease)
     }
 
@@ -108,6 +116,7 @@ class AudioEngine {
                 hpf.processBuffer(buffer, read)
                 equalizer.processBuffer(buffer, read)
                 noiseGate.processBuffer(buffer, read)
+                compressor.processBuffer(buffer, read)
                 limiter.processBuffer(buffer, read)
 
                 if (monitoringEnabled) monitorTrack?.write(buffer, 0, read)
