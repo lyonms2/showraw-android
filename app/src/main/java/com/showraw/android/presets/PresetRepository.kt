@@ -11,6 +11,7 @@ object PresetRepository {
             videoResolution = Resolution.R4K_30, estimatedMbPerMin = 350,
             contextualWarning = null,
             stabilization = true,
+            inputGainDb = 18f,  // mic longe do palco + sem AGC
         ),
         Preset(
             id = "sport", name = "Esporte / Estádio", emoji = "🏟️",
@@ -20,6 +21,7 @@ object PresetRepository {
             videoResolution = Resolution.R4K_60, estimatedMbPerMin = 600,
             contextualWarning = "Gera ~600 MB/min. Verifique o espaço disponível.",
             stabilization = true,
+            inputGainDb = 18f,
         ),
         Preset(
             id = "outdoor", name = "Ao ar livre", emoji = "🌳",
@@ -29,6 +31,7 @@ object PresetRepository {
             videoResolution = Resolution.R4K_30, estimatedMbPerMin = 350,
             contextualWarning = "Otimizado para voz com vento. Para instrumentos, use Ambiente interno.",
             stabilization = true,
+            inputGainDb = 12f,
         ),
         Preset(
             id = "vlog", name = "Vlog / Rua", emoji = "📱",
@@ -38,6 +41,7 @@ object PresetRepository {
             videoResolution = Resolution.R4K_30, estimatedMbPerMin = 350,
             contextualWarning = null,
             stabilization = true,
+            inputGainDb = 9f,   // celular próximo da voz
         ),
         Preset(
             id = "indoor", name = "Ambiente interno", emoji = "🏠",
@@ -46,6 +50,7 @@ object PresetRepository {
             hpfFrequency = 80f, hpfRolloff = 12,
             videoResolution = Resolution.R4K_30, estimatedMbPerMin = 350,
             contextualWarning = null,
+            inputGainDb = 9f,
         ),
         Preset(
             id = "bar", name = "Bar / Restaurante", emoji = "🍺",
@@ -54,6 +59,7 @@ object PresetRepository {
             hpfFrequency = 100f, hpfRolloff = 18,
             videoResolution = Resolution.R1080P_30, estimatedMbPerMin = 130,
             contextualWarning = "Vídeo em 1080p para economizar espaço.",
+            inputGainDb = 12f,
         ),
         Preset(
             id = "talk", name = "Palestra / Evento", emoji = "🎤",
@@ -62,6 +68,7 @@ object PresetRepository {
             hpfFrequency = 80f, hpfRolloff = 12,
             videoResolution = Resolution.R1080P_30, estimatedMbPerMin = 130,
             contextualWarning = null,
+            inputGainDb = 9f,
         ),
         Preset(
             id = "manual", name = "Manual (Pro)", emoji = "🎛️",
@@ -70,6 +77,7 @@ object PresetRepository {
             hpfFrequency = 120f, hpfRolloff = 18,
             videoResolution = Resolution.R4K_30, estimatedMbPerMin = 350,
             contextualWarning = null,
+            inputGainDb = 0f,   // usuário define manualmente
         ),
     )
 

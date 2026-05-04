@@ -27,6 +27,8 @@ data class Preset(
     val eqHighGainDb: Float        = 0f,    // dB, high shelf @ 8 kHz
     // Câmera
     val stabilization: Boolean     = false,
+    // Ganho de entrada (compensa ausência de AGC ao usar UNPROCESSED)
+    val inputGainDb: Float         = 6f,    // dB aplicados antes do HPF
     // Gravação
     val maxDurationMinutes: Int    = 0,     // 0 = ilimitado
 )

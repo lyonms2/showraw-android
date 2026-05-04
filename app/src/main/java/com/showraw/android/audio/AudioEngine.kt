@@ -6,6 +6,7 @@ import android.media.AudioRecord
 import android.media.AudioTrack
 import android.media.MediaRecorder
 import android.os.Process
+import kotlin.math.pow
 import com.showraw.android.presets.Preset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +47,7 @@ class AudioEngine {
 
     private var monitorTrack: AudioTrack? = null
     @Volatile private var monitoringEnabled = false
+    @Volatile private var preGainFactor = 1f
 
     private val hpf       = HighPassFilter()
     private val equalizer = Equalizer()
@@ -60,6 +62,7 @@ class AudioEngine {
     @Volatile private var paused = false
 
     fun configure(preset: Preset) {
+        preGainFactor = 10.0.pow(preset.inputGainDb / 20.0).toFloat()
         hpf.configure(preset.hpfFrequency, preset.hpfRolloff)
         equalizer.configure(
             lowGainDb  = preset.eqLowGainDb,
@@ -96,6 +99,12 @@ class AudioEngine {
                 if (read <= 0) continue
                 if (paused) continue  // drena AudioRecord sem processar
 
+                if (preGainFactor != 1f) {
+                    for (i in 0 until read) {
+                        buffer[i] = (buffer[i] * preGainFactor).toInt()
+                            .coerceIn(-32768, 32767).toShort()
+                    }
+                }
                 hpf.processBuffer(buffer, read)
                 equalizer.processBuffer(buffer, read)
                 noiseGate.processBuffer(buffer, read)
