@@ -14,10 +14,10 @@ object PresetRepository {
             stabilization = true,
             // DSP
             inputGainDb = 12f,
-            noiseGateThreshold = -45f,
-            eqLowGainDb = 0f, eqMidGainDb = -2f, eqHighGainDb = 3f,
+            noiseGateThreshold = -60f,          // plateia nunca silencia — gate desabilitado
+            eqLowGainDb = 0f, eqMidGainDb = 0f, eqHighGainDb = 3f,  // mid 1kHz é presença, não barro
             compressorThreshold = -20f, compressorRatio = 4f,
-            compressorAttack = 10f, compressorRelease = 100f, compressorMakeupDb = 8f,
+            compressorAttack = 10f, compressorRelease = 100f, compressorMakeupDb = 6f,
         ),
 
         Preset(
@@ -30,10 +30,10 @@ object PresetRepository {
             stabilization = true,
             // DSP
             inputGainDb = 12f,
-            noiseGateThreshold = -45f,
+            noiseGateThreshold = -60f,          // torcida nunca silencia — gate desabilitado
             eqLowGainDb = 0f, eqMidGainDb = -1f, eqHighGainDb = 2f,
             compressorThreshold = -20f, compressorRatio = 4f,
-            compressorAttack = 10f, compressorRelease = 100f, compressorMakeupDb = 8f,
+            compressorAttack = 10f, compressorRelease = 100f, compressorMakeupDb = 6f,
         ),
 
         Preset(
@@ -108,7 +108,7 @@ object PresetRepository {
             // DSP
             inputGainDb = 9f,
             noiseGateThreshold = -35f,
-            eqLowGainDb = -1f, eqMidGainDb = 3f, eqHighGainDb = 1f,
+            eqLowGainDb = -1f, eqMidGainDb = 2f, eqHighGainDb = 1f,
             compressorThreshold = -20f, compressorRatio = 2f,
             compressorAttack = 25f, compressorRelease = 200f, compressorMakeupDb = 4f,
         ),
