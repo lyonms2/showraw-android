@@ -114,23 +114,41 @@
         android:layout_marginBottom="8dp"
         android:textColor="@color/text_secondary"
         android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@id/btn_record"
+        app:layout_constraintBottom_toTopOf="@id/bottom_buttons"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <Button
-        android:id="@+id/btn_record"
+    <LinearLayout
+        android:id="@+id/bottom_buttons"
         android:layout_width="0dp"
-        android:layout_height="52dp"
+        android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginBottom="20dp"
-        android:backgroundTint="@color/primary"
-        android:text="● Gravar"
-        android:textColor="@color/bg_main"
-        android:textSize="16sp"
-        android:textStyle="bold"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/btn_library"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="@color/bg_card"
+            android:text="🎬"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/btn_record"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/primary"
+            android:text="● Gravar"
+            android:textColor="@color/bg_main"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

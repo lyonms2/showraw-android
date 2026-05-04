@@ -3,6 +3,7 @@ package com.showraw.android
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.showraw.android.ui.export.ExportFragment
+import com.showraw.android.ui.library.LibraryFragment
 import com.showraw.android.ui.presets.PresetsFragment
 import com.showraw.android.ui.recording.RecordingFragment
 import com.showraw.android.ui.settings.SettingsFragment
@@ -27,9 +28,9 @@ class MainActivity : AppCompatActivity(), Navigator {
             .commit()
     }
 
-    override fun showExport(videoPath: String, wavPath: String) {
+    override fun showExport(videoPath: String, wavPath: String, sessionName: String) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, ExportFragment.newInstance(videoPath, wavPath))
+            .replace(R.id.fragment_container, ExportFragment.newInstance(videoPath, wavPath, sessionName))
             .addToBackStack("export")
             .commit()
     }
@@ -42,6 +43,13 @@ class MainActivity : AppCompatActivity(), Navigator {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, SettingsFragment())
             .addToBackStack("settings")
+            .commit()
+    }
+
+    override fun showLibrary() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, LibraryFragment())
+            .addToBackStack("library")
             .commit()
     }
 }

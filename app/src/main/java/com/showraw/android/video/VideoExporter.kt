@@ -3,6 +3,7 @@ package com.showraw.android.video
 import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
+import android.media.MediaMetadataRetriever
 import android.media.MediaMuxer
 import com.showraw.android.audio.AudioEncoder
 import kotlinx.coroutines.Dispatchers
@@ -10,7 +11,10 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.nio.ByteBuffer
 
-enum class ExportMode { VIDEO_FINAL, STEMS_WAV, BOTH }
+data class ExportResult(
+    val videoMp4:  File,   // MP4 final com vídeo + áudio processado
+    val audioM4a:  File,   // stem de áudio AAC 256kbps (MP4/M4A)
+)
 
 object VideoExporter {
 
@@ -21,14 +25,14 @@ object VideoExporter {
      *   1. PCM WAV → AAC MP4 (MediaCodec, ~70% do progresso)
      *   2. MediaExtractor lê video track + audio track
      *   3. MediaMuxer escreve o MP4 final com A/V sync
-     *   4. Arquivos temporários deletados
+     *   4. Arquivos temporários deletados; AAC preservado como stem
      */
     suspend fun mux(
         videoFile:  File,
         wavFile:    File,
         outputFile: File,
         onProgress: (Float) -> Unit = {},
-    ): File = withContext(Dispatchers.IO) {
+    ): ExportResult = withContext(Dispatchers.IO) {
 
         onProgress(0f)
 
@@ -49,7 +53,16 @@ object VideoExporter {
         videoExtractor.selectTrack(videoTrackIdx)
         audioExtractor.selectTrack(0)
 
+        // MediaExtractor.getTrackFormat() não inclui KEY_ROTATION — é metadado de container
+        // (caixa tkhd do MP4), não de trilha. Ler com MediaMetadataRetriever e reinjetar.
+        val srcRotation = MediaMetadataRetriever().use { r ->
+            r.setDataSource(videoFile.absolutePath)
+            r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)
+                ?.toIntOrNull() ?: 0
+        }
+
         val videoFormat = videoExtractor.getTrackFormat(videoTrackIdx)
+        if (srcRotation != 0) videoFormat.setInteger(MediaFormat.KEY_ROTATION, srcRotation)
         val audioFormat = audioExtractor.getTrackFormat(0)
 
         // ── Passo 3: mux ─────────────────────────────────────────────
@@ -92,12 +105,18 @@ object VideoExporter {
         audioExtractor.release()
         onProgress(0.95f)
 
-        // ── Passo 4: limpar temporários ──────────────────────────────
+        // ── Passo 4: limpar temporários (WAV e vídeo raw); AAC preservado ──
         videoFile.delete()
         wavFile.delete()
-        aacMp4.delete()
+
+        // Renomear AAC para nome legível ao lado do MP4 final
+        val audioStem = File(outputFile.parent, "${outputFile.nameWithoutExtension}_audio.m4a")
+        if (!aacMp4.renameTo(audioStem)) {
+            aacMp4.copyTo(audioStem, overwrite = true)
+            aacMp4.delete()
+        }
 
         onProgress(1f)
-        outputFile
+        ExportResult(videoMp4 = outputFile, audioM4a = audioStem)
     }
 }

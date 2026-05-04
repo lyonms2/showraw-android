@@ -10,6 +10,7 @@ object PresetRepository {
             hpfFrequency = 120f, hpfRolloff = 18,
             videoResolution = Resolution.R4K_30, estimatedMbPerMin = 350,
             contextualWarning = null,
+            stabilization = true,
         ),
         Preset(
             id = "sport", name = "Esporte / Estádio", emoji = "🏟️",
@@ -18,6 +19,7 @@ object PresetRepository {
             hpfFrequency = 100f, hpfRolloff = 18,
             videoResolution = Resolution.R4K_60, estimatedMbPerMin = 600,
             contextualWarning = "Gera ~600 MB/min. Verifique o espaço disponível.",
+            stabilization = true,
         ),
         Preset(
             id = "outdoor", name = "Ao ar livre", emoji = "🌳",
@@ -26,6 +28,7 @@ object PresetRepository {
             hpfFrequency = 150f, hpfRolloff = 24,
             videoResolution = Resolution.R4K_30, estimatedMbPerMin = 350,
             contextualWarning = "Otimizado para voz com vento. Para instrumentos, use Ambiente interno.",
+            stabilization = true,
         ),
         Preset(
             id = "vlog", name = "Vlog / Rua", emoji = "📱",
@@ -34,6 +37,7 @@ object PresetRepository {
             hpfFrequency = 120f, hpfRolloff = 12,
             videoResolution = Resolution.R4K_30, estimatedMbPerMin = 350,
             contextualWarning = null,
+            stabilization = true,
         ),
         Preset(
             id = "indoor", name = "Ambiente interno", emoji = "🏠",

@@ -20,4 +20,13 @@ data class Preset(
     val videoResolution: Resolution,
     val estimatedMbPerMin: Int,
     val contextualWarning: String?,  // null = sem aviso
+    // DSP expansions
+    val noiseGateThreshold: Float  = -60f,  // dBFS; ≤ -59 = desabilitado
+    val eqLowGainDb: Float         = 0f,    // dB, low shelf  @ 200 Hz
+    val eqMidGainDb: Float         = 0f,    // dB, peaking    @ 1 kHz
+    val eqHighGainDb: Float        = 0f,    // dB, high shelf @ 8 kHz
+    // Câmera
+    val stabilization: Boolean     = false,
+    // Gravação
+    val maxDurationMinutes: Int    = 0,     // 0 = ilimitado
 )

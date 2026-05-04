@@ -42,28 +42,34 @@ class AudioEngine {
     private var captureJob: Job?       = null
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    private val limiter = Limiter()
-    private val hpf     = HighPassFilter()
+    private val hpf       = HighPassFilter()
+    private val equalizer = Equalizer()
+    private val noiseGate = NoiseGate()
+    private val limiter   = Limiter()
 
     var onBufferReady: ((ShortArray, Int) -> Unit)? = null
     var onStats:       ((AudioStats)      -> Unit)? = null
     var onSplWarning:  (() -> Unit)?                = null
 
     private var splWarningSince = 0L
+    @Volatile private var paused = false
 
     fun configure(preset: Preset) {
-        limiter.configure(preset.limiterThreshold, preset.limiterAttack, preset.limiterRelease)
         hpf.configure(preset.hpfFrequency, preset.hpfRolloff)
+        equalizer.configure(
+            lowGainDb  = preset.eqLowGainDb,
+            midGainDb  = preset.eqMidGainDb,
+            highGainDb = preset.eqHighGainDb,
+        )
+        noiseGate.configure(preset.noiseGateThreshold)
+        limiter.configure(preset.limiterThreshold, preset.limiterAttack, preset.limiterRelease)
     }
 
     fun start() {
         val bufSize = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_CFG, ENCODING)
             .coerceAtLeast(1024 * 2 * 2)  // mínimo 1024 samples, estéreo, 16bit
 
-        recorder = AudioRecord(
-            MediaRecorder.AudioSource.UNPROCESSED,
-            SAMPLE_RATE, CHANNEL_CFG, ENCODING, bufSize,
-        ).also { it.startRecording() }
+        recorder = createAudioRecord(bufSize).also { it.startRecording() }
 
         val buffer = ShortArray(bufSize / 2)
 
@@ -72,8 +78,11 @@ class AudioEngine {
             while (isActive) {
                 val read = recorder?.read(buffer, 0, buffer.size) ?: break
                 if (read <= 0) continue
+                if (paused) continue  // drena AudioRecord sem processar
 
                 hpf.processBuffer(buffer, read)
+                equalizer.processBuffer(buffer, read)
+                noiseGate.processBuffer(buffer, read)
                 limiter.processBuffer(buffer, read)
 
                 val rms  = MicBlender.computeRms(buffer, read)
@@ -96,7 +105,27 @@ class AudioEngine {
         }
     }
 
+    private fun createAudioRecord(bufSize: Int): AudioRecord {
+        val sources = listOf(
+            MediaRecorder.AudioSource.UNPROCESSED,  // raw — ideal para nosso DSP
+            MediaRecorder.AudioSource.CAMCORDER,    // tuned para vídeo, sem AGC
+            MediaRecorder.AudioSource.MIC,          // fallback final
+        )
+        for (source in sources) {
+            try {
+                val rec = AudioRecord(source, SAMPLE_RATE, CHANNEL_CFG, ENCODING, bufSize)
+                if (rec.state == AudioRecord.STATE_INITIALIZED) return rec
+                rec.release()
+            } catch (_: Exception) { /* tentar próxima fonte */ }
+        }
+        throw IllegalStateException("Nenhuma fonte de áudio disponível neste dispositivo")
+    }
+
+    fun pause()  { paused = true  }
+    fun resume() { paused = false }
+
     fun stop() {
+        paused = false
         captureJob?.cancel()
         captureJob = null
         recorder?.stop()

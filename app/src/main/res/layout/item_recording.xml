@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/bg_card"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginTop="10dp">
+
+    <ImageView
+        android:id="@+id/iv_thumb"
+        android:layout_width="100dp"
+        android:layout_height="72dp"
+        android:scaleType="centerCrop"
+        android:background="#111111"
+        android:foreground="?attr/selectableItemBackground"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="▶"
+        android:textColor="#AAFFFFFF"
+        android:textSize="20sp"
+        android:clickable="false"
+        android:importantForAccessibility="no"
+        app:layout_constraintTop_toTopOf="@id/iv_thumb"
+        app:layout_constraintBottom_toBottomOf="@id/iv_thumb"
+        app:layout_constraintStart_toStartOf="@id/iv_thumb"
+        app:layout_constraintEnd_toEndOf="@id/iv_thumb" />
+
+    <LinearLayout
+        android:id="@+id/info_col"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginVertical="10dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iv_thumb"
+        app:layout_constraintEnd_toStartOf="@id/btn_col">
+
+        <TextView
+            android:id="@+id/tv_item_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/tv_item_meta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:textColor="@color/text_secondary"
+            android:textSize="11sp"
+            android:fontFamily="monospace" />
+
+        <TextView
+            android:id="@+id/tv_item_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="#666666"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/btn_col"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/btn_share_video"
+            android:layout_width="72dp"
+            android:layout_height="30dp"
+            android:backgroundTint="@color/bg_main"
+            android:text="↑ Vídeo"
+            android:textColor="@color/primary"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
+
+        <Button
+            android:id="@+id/btn_share_audio"
+            android:layout_width="72dp"
+            android:layout_height="30dp"
+            android:backgroundTint="@color/bg_main"
+            android:text="↑ Áudio"
+            android:textColor="@color/primary_light"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
+
+        <Button
+            android:id="@+id/btn_delete"
+            android:layout_width="72dp"
+            android:layout_height="30dp"
+            android:backgroundTint="@color/bg_main"
+            android:text="🗑"
+            android:textColor="@color/alert_red"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

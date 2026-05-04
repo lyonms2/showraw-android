@@ -13,6 +13,13 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <!-- Upload YouTube -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Foreground service para manter gravação em background -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- API 34+: tipos camera e microphone exigem permissões próprias -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <!-- Wake lock para impedir CPU sleep durante gravação -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <uses-feature android:name="android.hardware.camera"     android:required="true" />
     <uses-feature android:name="android.hardware.microphone" android:required="true" />
@@ -46,6 +53,12 @@
             android:name=".ui.phase2.Phase2Activity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
+        <!-- Serviço de gravação em foreground (wake lock + notificação) -->
+        <service
+            android:name=".RecordingService"
+            android:exported="false"
+            android:foregroundServiceType="camera|microphone" />
 
         <!-- FileProvider para partilha de gravações -->
         <provider

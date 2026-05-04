@@ -1,6 +1,8 @@
 package com.showraw.android.ui.export
 
 import android.content.Intent
+import android.media.MediaMetadataRetriever
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,12 +11,14 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import com.showraw.android.Navigator
 import com.showraw.android.databinding.FragmentExportBinding
+import com.showraw.android.video.ExportResult
 import com.showraw.android.video.VideoExporter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -26,7 +30,7 @@ class ExportFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-    private var outputFile: File? = null
+    private var exportResult: ExportResult? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
@@ -38,25 +42,27 @@ class ExportFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val videoPath = arguments?.getString(ARG_VIDEO_PATH) ?: return
-        val wavPath   = arguments?.getString(ARG_WAV_PATH)   ?: return
+        val videoPath   = arguments?.getString(ARG_VIDEO_PATH)   ?: return
+        val wavPath     = arguments?.getString(ARG_WAV_PATH)     ?: return
+        val sessionName = arguments?.getString(ARG_SESSION_NAME) ?: ""
 
         binding.btnNewRecording.setOnClickListener {
             (requireActivity() as? Navigator)?.newRecording()
         }
-        binding.btnShare.setOnClickListener { shareOutput() }
+        binding.btnShareVideo.setOnClickListener { shareFile(exportResult?.videoMp4, "video/mp4") }
+        binding.btnShareAudio.setOnClickListener { shareFile(exportResult?.audioM4a, "audio/mp4") }
 
-        startExport(File(videoPath), File(wavPath))
+        startExport(File(videoPath), File(wavPath), sessionName)
     }
 
-    private fun startExport(videoFile: File, wavFile: File) {
-        val ts  = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-        val out = File(requireContext().getExternalFilesDir(null), "showraw_$ts.mp4")
-        outputFile = out
+    private fun startExport(videoFile: File, wavFile: File, sessionName: String) {
+        val ts     = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+        val prefix = if (sessionName.isNotEmpty()) sessionName.replace(Regex("[^a-zA-Z0-9_\\-]"), "_").take(40) else "showraw"
+        val out    = File(requireContext().getExternalFilesDir(null), "${prefix}_$ts.mp4")
 
         scope.launch {
             try {
-                VideoExporter.mux(videoFile, wavFile, out) { progress ->
+                val result = VideoExporter.mux(videoFile, wavFile, out) { progress ->
                     activity?.runOnUiThread {
                         binding.exportProgress.progress = (progress * 100).toInt()
                         binding.tvExportStatus.text = when {
@@ -67,38 +73,71 @@ class ExportFragment : Fragment() {
                     }
                 }
 
-                val mb = "%.1f".format(out.length() / 1_048_576f)
+                exportResult = result
+
+                // Extrair thumbnail off-thread
+                val thumb = withContext(Dispatchers.IO) {
+                    runCatching {
+                        MediaMetadataRetriever().use { r ->
+                            r.setDataSource(result.videoMp4.absolutePath)
+                            r.getFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
+                        }
+                    }.getOrNull()
+                }
+
+                val videoMb = "%.1f".format(result.videoMp4.length() / 1_048_576f)
+                val audioMb = "%.1f".format(result.audioM4a.length() / 1_048_576f)
+
                 activity?.runOnUiThread {
                     binding.exportProgress.progress = 100
-                    binding.tvExportStatus.text = "Concluído"
-                    binding.resultCard.visibility    = View.VISIBLE
-                    binding.tvResultPath.text        = "$mb MB · ${out.name}"
-                    binding.btnShare.visibility         = View.VISIBLE
-                    binding.btnNewRecording.visibility  = View.VISIBLE
+                    binding.tvExportStatus.text     = "Concluído"
+                    binding.tvResultVideo.text      = "$videoMb MB · ${result.videoMp4.name}"
+                    binding.tvResultAudio.text      = "$audioMb MB · ${result.audioM4a.name}"
+                    if (thumb != null) {
+                        binding.ivThumbnail.setImageBitmap(thumb)
+                        binding.ivThumbnail.setOnClickListener { playVideo(result.videoMp4) }
+                    }
+                    binding.resultCard.visibility      = View.VISIBLE
+                    binding.btnShareRow.visibility     = View.VISIBLE
+                    binding.btnNewRecording.visibility = View.VISIBLE
                 }
 
             } catch (e: Exception) {
                 activity?.runOnUiThread {
-                    binding.tvExportStatus.text = "❌ Erro: ${e.message}"
+                    binding.tvExportStatus.text        = "❌ Erro: ${e.message}"
                     binding.btnNewRecording.visibility = View.VISIBLE
                 }
             }
         }
     }
 
-    private fun shareOutput() {
-        val file = outputFile ?: return
-        val uri = FileProvider.getUriForFile(
+    private fun shareFile(file: File?, mimeType: String) {
+        file ?: return
+        val uri: Uri = FileProvider.getUriForFile(
             requireContext(),
             "${requireContext().packageName}.provider",
             file,
         )
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "video/mp4"
-            putExtra(Intent.EXTRA_STREAM, uri)
+        val label = if (mimeType.startsWith("video")) "Compartilhar vídeo" else "Compartilhar áudio"
+        startActivity(Intent.createChooser(
+            Intent(Intent.ACTION_SEND).apply {
+                type = mimeType
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }, label
+        ))
+    }
+
+    private fun playVideo(file: File) {
+        val uri: Uri = FileProvider.getUriForFile(
+            requireContext(),
+            "${requireContext().packageName}.provider",
+            file,
+        )
+        startActivity(Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "video/mp4")
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        startActivity(Intent.createChooser(intent, "Compartilhar gravação"))
+        })
     }
 
     override fun onDestroyView() {
@@ -108,14 +147,17 @@ class ExportFragment : Fragment() {
     }
 
     companion object {
-        private const val ARG_VIDEO_PATH = "video_path"
-        private const val ARG_WAV_PATH   = "wav_path"
+        private const val ARG_VIDEO_PATH   = "video_path"
+        private const val ARG_WAV_PATH     = "wav_path"
+        private const val ARG_SESSION_NAME = "session_name"
 
-        fun newInstance(videoPath: String, wavPath: String) = ExportFragment().apply {
-            arguments = Bundle().apply {
-                putString(ARG_VIDEO_PATH, videoPath)
-                putString(ARG_WAV_PATH,   wavPath)
+        fun newInstance(videoPath: String, wavPath: String, sessionName: String = "") =
+            ExportFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_VIDEO_PATH,   videoPath)
+                    putString(ARG_WAV_PATH,     wavPath)
+                    putString(ARG_SESSION_NAME, sessionName)
+                }
             }
-        }
     }
 }

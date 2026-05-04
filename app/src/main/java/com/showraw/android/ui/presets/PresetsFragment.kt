@@ -51,6 +51,10 @@ class PresetsFragment : Fragment() {
                 nav.startRecording(selectedPreset.id)
             }
         }
+
+        binding.btnLibrary.setOnClickListener {
+            (requireActivity() as? Navigator)?.showLibrary()
+        }
     }
 
     private fun updateSummary(preset: Preset) {
