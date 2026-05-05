@@ -3,6 +3,7 @@ package com.showraw.android.presets
 import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.UUID
 
 object CustomPresetStore {
 
@@ -28,6 +29,14 @@ object CustomPresetStore {
     fun delete(context: Context, id: String) {
         persist(context, load(context).filter { it.id != id })
     }
+
+    fun toExportJson(preset: Preset): String = preset.toJson().toString()
+
+    fun importFromJson(context: Context, json: String): Boolean = runCatching {
+        val imported = JSONObject(json).toPreset().copy(id = UUID.randomUUID().toString())
+        save(context, imported)
+        true
+    }.getOrDefault(false)
 
     private fun persist(context: Context, list: List<Preset>) {
         val arr = JSONArray(list.map { it.toJson() })

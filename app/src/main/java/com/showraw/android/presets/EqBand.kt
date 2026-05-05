@@ -10,7 +10,8 @@ data class EqBand(
 )
 
 fun defaultEqBands() = listOf(
-    EqBand(EqFilterType.LOW_SHELF,  200f,  0f, 0.707f),
-    EqBand(EqFilterType.PEAKING,   1_000f, 0f, 0.707f),
-    EqBand(EqFilterType.HIGH_SHELF, 8_000f, 0f, 0.707f),
+    EqBand(EqFilterType.LOW_SHELF,  200f,   0f, 0.707f),
+    EqBand(EqFilterType.PEAKING,   1_000f,  0f, 0.707f),
+    EqBand(EqFilterType.PEAKING,   3_000f,  0f, 0.707f),
+    EqBand(EqFilterType.HIGH_SHELF, 8_000f,  0f, 0.707f),
 )

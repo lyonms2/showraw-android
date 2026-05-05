@@ -224,8 +224,44 @@
             android:max="18" android:progress="6"
             android:progressTint="@color/primary" android:thumbTint="@color/primary" />
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="14dp"
             android:text="Ratio 2:1 suave, 4:1 moderado, 8:1 agressivo. Makeup compensa a redução de nível."
+            android:textColor="#666666" android:textSize="11sp" android:lineSpacingMultiplier="1.3" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Attack"
+                android:textColor="@color/white" android:textSize="13sp" />
+            <TextView android:id="@+id/tv_comp_attack_val"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="20 ms" android:textColor="@color/primary"
+                android:textSize="13sp" android:fontFamily="monospace" />
+        </LinearLayout>
+        <SeekBar android:id="@+id/sb_comp_attack"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:layout_marginBottom="14dp"
+            android:max="199" android:progress="19"
+            android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Release"
+                android:textColor="@color/white" android:textSize="13sp" />
+            <TextView android:id="@+id/tv_comp_release_val"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="150 ms" android:textColor="@color/primary"
+                android:textSize="13sp" android:fontFamily="monospace" />
+        </LinearLayout>
+        <SeekBar android:id="@+id/sb_comp_release"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:layout_marginBottom="4dp"
+            android:max="450" android:progress="100"
+            android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="Attack rápido reage na transiente · Release lento soa mais natural e transparente."
             android:textColor="#666666" android:textSize="11sp" android:lineSpacingMultiplier="1.3" />
 
         <!-- Divider -->
@@ -326,9 +362,9 @@
             android:max="24" android:progress="12"
             android:progressTint="@color/primary" android:thumbTint="@color/primary" />
 
-        <!-- Band 2: Peaking (Mid) -->
+        <!-- Band 2: Peaking (Mid 1) -->
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="BANDA 2 — PEAKING (MID)" android:textColor="#666666"
+            android:text="BANDA 2 — PEAKING (MID 1)" android:textColor="#666666"
             android:textSize="10sp" android:letterSpacing="0.1" android:layout_marginBottom="8dp" />
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -383,9 +419,62 @@
             android:text="Q baixo (0.3) = banda larga e suave  ·  Q alto (3.0) = banda estreita e cirúrgica"
             android:textColor="#555555" android:textSize="11sp" />
 
-        <!-- Band 3: High Shelf -->
+        <!-- Band 3: Peaking (Mid 2) -->
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="BANDA 3 — HIGH SHELF" android:textColor="#666666"
+            android:text="BANDA 3 — PEAKING (MID 2)" android:textColor="#666666"
+            android:textSize="10sp" android:letterSpacing="0.1" android:layout_marginBottom="8dp" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Frequência"
+                android:textColor="@color/white" android:textSize="13sp" />
+            <TextView android:id="@+id/tv_eq_mid2_freq"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="3.0 kHz" android:textColor="@color/primary"
+                android:textSize="13sp" android:fontFamily="monospace" />
+        </LinearLayout>
+        <SeekBar android:id="@+id/sb_eq_mid2_freq"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:layout_marginBottom="10dp"
+            android:max="100" android:progress="73"
+            android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Ganho"
+                android:textColor="@color/white" android:textSize="13sp" />
+            <TextView android:id="@+id/tv_eq_mid2_gain"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="0 dB" android:textColor="@color/primary"
+                android:textSize="13sp" android:fontFamily="monospace" />
+        </LinearLayout>
+        <SeekBar android:id="@+id/sb_eq_mid2_gain"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:layout_marginBottom="10dp"
+            android:max="24" android:progress="12"
+            android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Q (largura de banda)"
+                android:textColor="@color/white" android:textSize="13sp" />
+            <TextView android:id="@+id/tv_eq_mid2_q"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="0.7" android:textColor="@color/primary"
+                android:textSize="13sp" android:fontFamily="monospace" />
+        </LinearLayout>
+        <SeekBar android:id="@+id/sb_eq_mid2_q"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:layout_marginBottom="16dp"
+            android:max="27" android:progress="4"
+            android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+
+        <!-- Band 4: High Shelf -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="BANDA 4 — HIGH SHELF" android:textColor="#666666"
             android:textSize="10sp" android:letterSpacing="0.1" android:layout_marginBottom="8dp" />
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -506,7 +595,7 @@
                 android:textColor="@color/white" android:textSize="13sp" android:buttonTint="@color/primary" />
         </RadioGroup>
 
-        <!-- Salvar -->
+        <!-- Salvar / Exportar -->
         <Button
             android:id="@+id/btn_save_preset"
             android:layout_width="match_parent"
@@ -517,6 +606,16 @@
             android:textColor="@color/bg_main"
             android:textSize="16sp"
             android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_export_preset"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/bg_card"
+            android:text="📤 Exportar como JSON"
+            android:textColor="@color/primary"
+            android:textSize="14sp" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

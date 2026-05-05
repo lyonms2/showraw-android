@@ -7,6 +7,8 @@ import android.os.StatFs
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -25,6 +27,22 @@ class PresetsFragment : Fragment() {
 
     private lateinit var adapter: PresetAdapter
 
+    private val importLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri ?: return@registerForActivityResult
+        try {
+            val json = requireContext().contentResolver.openInputStream(uri)
+                ?.bufferedReader()?.readText() ?: return@registerForActivityResult
+            if (CustomPresetStore.importFromJson(requireContext(), json)) {
+                refreshPresets()
+                Toast.makeText(requireContext(), "Preset importado!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Arquivo inválido ou corrompido.", Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Erro ao importar: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
     ): View {
@@ -36,8 +54,8 @@ class PresetsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = PresetAdapter(
-            onSelect = { preset -> updateSummary(preset) },
-            onAdd    = { (requireActivity() as? Navigator)?.showCustomPresetEditor(null) },
+            onSelect    = { preset -> updateSummary(preset) },
+            onAdd       = { (requireActivity() as? Navigator)?.showCustomPresetEditor(null) },
             onLongPress = { preset -> showPresetOptions(preset) },
         )
         binding.rvPresets.layoutManager = GridLayoutManager(requireContext(), 2)
@@ -52,6 +70,10 @@ class PresetsFragment : Fragment() {
 
         binding.btnLibrary.setOnClickListener {
             (requireActivity() as? Navigator)?.showLibrary()
+        }
+
+        binding.btnImport.setOnClickListener {
+            importLauncher.launch("*/*")
         }
 
         binding.btnManual.setOnClickListener {
@@ -73,11 +95,11 @@ class PresetsFragment : Fragment() {
     private fun showPresetOptions(preset: Preset) {
         AlertDialog.Builder(requireContext())
             .setTitle("${preset.emoji} ${preset.name}")
-            .setItems(arrayOf("✏  Editar", "🗑  Excluir")) { _, which ->
+            .setItems(arrayOf("✏  Editar", "📤  Exportar", "🗑  Excluir")) { _, which ->
                 when (which) {
                     0 -> (requireActivity() as? Navigator)?.showCustomPresetEditor(preset.id)
-                    1 -> {
-                        AlertDialog.Builder(requireContext())
+                    1 -> exportPreset(preset)
+                    2 -> AlertDialog.Builder(requireContext())
                             .setMessage("Excluir \"${preset.name}\"?")
                             .setPositiveButton("Excluir") { _, _ ->
                                 CustomPresetStore.delete(requireContext(), preset.id)
@@ -85,10 +107,19 @@ class PresetsFragment : Fragment() {
                             }
                             .setNegativeButton("Cancelar", null)
                             .show()
-                    }
                 }
             }
             .show()
+    }
+
+    private fun exportPreset(preset: Preset) {
+        val json = CustomPresetStore.toExportJson(preset)
+        val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(android.content.Intent.EXTRA_TEXT, json)
+            putExtra(android.content.Intent.EXTRA_SUBJECT, "Preset ShowRaw: ${preset.name}")
+        }
+        startActivity(android.content.Intent.createChooser(intent, "Exportar preset"))
     }
 
     private fun updateSummary(preset: Preset) {
