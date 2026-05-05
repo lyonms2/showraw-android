@@ -28,8 +28,9 @@ data class RecordingItem(
 class RecordingAdapter(
     private val context: Context,
     private val scope:   CoroutineScope,
-    private val onShare: (File, String) -> Unit,
-    private val onDelete: (RecordingItem, Int) -> Unit,
+    private val onShare:   (File, String) -> Unit,
+    private val onDelete:  (RecordingItem, Int) -> Unit,
+    private val onGallery: (RecordingItem) -> Unit,
 ) : RecyclerView.Adapter<RecordingAdapter.VH>() {
 
     private val items = mutableListOf<RecordingItem>()
@@ -105,6 +106,7 @@ class RecordingAdapter(
             b.btnShareAudio.setOnClickListener {
                 item.audioFile?.let { onShare(it, "audio/mp4") }
             }
+            b.btnGallery.setOnClickListener { onGallery(item) }
             b.btnDelete.setOnClickListener { onDelete(item, pos) }
         }
 

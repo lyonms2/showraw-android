@@ -65,6 +65,16 @@
             android:textSize="14sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/tv_result_meta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text=""
+            android:textColor="@color/primary"
+            android:textSize="12sp"
+            android:fontFamily="monospace" />
+
         <!-- Thumbnail — toque para reproduzir -->
         <ImageView
             android:id="@+id/iv_thumbnail"
@@ -162,15 +172,30 @@
 
     </LinearLayout>
 
+    <Button
+        android:id="@+id/btn_save_gallery"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="@color/primary"
+        android:text="💾  Salvar na Galeria"
+        android:textColor="@color/bg_main"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/result_card"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!-- Botões de compartilhar: Vídeo | Áudio -->
     <LinearLayout
         android:id="@+id/btn_share_row"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="8dp"
         android:orientation="horizontal"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/result_card"
+        app:layout_constraintTop_toBottomOf="@id/btn_save_gallery"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 

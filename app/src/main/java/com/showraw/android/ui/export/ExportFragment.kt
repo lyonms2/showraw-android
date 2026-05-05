@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment
 import com.showraw.android.Navigator
 import com.showraw.android.databinding.FragmentExportBinding
 import com.showraw.android.video.ExportResult
+import com.showraw.android.video.GalleryExporter
 import com.showraw.android.video.VideoExporter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -58,6 +59,7 @@ class ExportFragment : Fragment() {
         binding.btnShareVideo.setOnClickListener { shareFile(exportResult?.videoMp4, "video/mp4") }
         binding.btnShareAudio.setOnClickListener { shareFile(exportResult?.audioM4a, "audio/mp4") }
         binding.btnShareYoutube.setOnClickListener { shareToYouTube(exportResult?.videoMp4) }
+        binding.btnSaveGallery.setOnClickListener { saveToGallery() }
 
         val location = getLastKnownLocation()
         startExport(File(videoPath), File(wavPath), sessionName, location)
@@ -92,14 +94,20 @@ class ExportFragment : Fragment() {
 
                 exportResult = result
 
-                // Extrair thumbnail off-thread
-                val thumb = withContext(Dispatchers.IO) {
-                    runCatching {
+                // Extrair thumbnail e metadados off-thread
+                data class ThumbAndMeta(
+                    val thumb: android.graphics.Bitmap?,
+                    val meta: GalleryExporter.VideoMeta,
+                )
+                val tm = withContext(Dispatchers.IO) {
+                    val thumb = runCatching {
                         MediaMetadataRetriever().use { r ->
                             r.setDataSource(result.videoMp4.absolutePath)
                             r.getFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
                         }
                     }.getOrNull()
+                    val meta = GalleryExporter.readMeta(result.videoMp4)
+                    ThumbAndMeta(thumb, meta)
                 }
 
                 val videoMb = "%.1f".format(result.videoMp4.length() / 1_048_576f)
@@ -108,13 +116,15 @@ class ExportFragment : Fragment() {
                 activity?.runOnUiThread {
                     binding.exportProgress.progress = 100
                     binding.tvExportStatus.text     = "Concluído"
+                    binding.tvResultMeta.text       = tm.meta.summary
                     binding.tvResultVideo.text      = "$videoMb MB · ${result.videoMp4.name}"
                     binding.tvResultAudio.text      = "$audioMb MB · ${result.audioM4a.name}"
-                    if (thumb != null) {
-                        binding.ivThumbnail.setImageBitmap(thumb)
+                    if (tm.thumb != null) {
+                        binding.ivThumbnail.setImageBitmap(tm.thumb)
                         binding.ivThumbnail.setOnClickListener { playVideo(result.videoMp4) }
                     }
                     binding.resultCard.visibility        = View.VISIBLE
+                    binding.btnSaveGallery.visibility    = View.VISIBLE
                     binding.btnShareRow.visibility       = View.VISIBLE
                     binding.btnShareYoutube.visibility   = View.VISIBLE
                     binding.btnNewRecording.visibility   = View.VISIBLE
@@ -124,6 +134,25 @@ class ExportFragment : Fragment() {
                 activity?.runOnUiThread {
                     binding.tvExportStatus.text        = "❌ Erro: ${e.message}"
                     binding.btnNewRecording.visibility = View.VISIBLE
+                }
+            }
+        }
+    }
+
+    private fun saveToGallery() {
+        val file = exportResult?.videoMp4 ?: return
+        binding.btnSaveGallery.isEnabled = false
+        scope.launch {
+            val ok = GalleryExporter.saveToGallery(requireContext(), file)
+            activity?.runOnUiThread {
+                if (ok) {
+                    binding.btnSaveGallery.text = "✓  Salvo na Galeria"
+                    android.widget.Toast.makeText(requireContext(),
+                        "Vídeo salvo em Galeria → Movies/ShowRaw", android.widget.Toast.LENGTH_SHORT).show()
+                } else {
+                    binding.btnSaveGallery.isEnabled = true
+                    android.widget.Toast.makeText(requireContext(),
+                        "Erro ao salvar na galeria.", android.widget.Toast.LENGTH_SHORT).show()
                 }
             }
         }

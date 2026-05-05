@@ -9,8 +9,10 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.showraw.android.databinding.FragmentLibraryBinding
+import com.showraw.android.video.GalleryExporter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -38,10 +40,11 @@ class LibraryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = RecordingAdapter(
-            context  = requireContext(),
-            scope    = scope,
-            onShare  = { file, mime -> shareFile(file, mime) },
-            onDelete = { item, pos -> confirmDelete(item, pos) },
+            context   = requireContext(),
+            scope     = scope,
+            onShare   = { file, mime -> shareFile(file, mime) },
+            onDelete  = { item, pos -> confirmDelete(item, pos) },
+            onGallery = { item -> saveToGallery(item) },
         )
         binding.rvLibrary.layoutManager = LinearLayoutManager(requireContext())
         binding.rvLibrary.adapter = adapter
@@ -86,6 +89,18 @@ class LibraryFragment : Fragment() {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }, label
         ))
+    }
+
+    private fun saveToGallery(item: RecordingItem) {
+        scope.launch {
+            val ok = GalleryExporter.saveToGallery(requireContext(), item.videoFile)
+            withContext(Dispatchers.Main) {
+                if (ok) Toast.makeText(requireContext(),
+                    "Salvo em Galeria → Movies/ShowRaw", Toast.LENGTH_SHORT).show()
+                else Toast.makeText(requireContext(),
+                    "Erro ao salvar na galeria.", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun confirmDelete(item: RecordingItem, pos: Int) {
