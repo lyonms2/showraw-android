@@ -1,10 +1,15 @@
 package com.showraw.android.ui.recording
 
 import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.media.AudioDeviceInfo
+import android.media.AudioManager
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -64,6 +69,13 @@ class RecordingFragment : Fragment() {
     private var recordStart = 0L
     private var recordedMs  = 0L
     private var freeMbAtStart = 0L
+    private var storageTickCount = 0
+
+    private val headsetReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == Intent.ACTION_HEADSET_PLUG) updateAudioSourceBadge()
+        }
+    }
 
     private val orientationListener by lazy {
         object : OrientationEventListener(requireContext()) {
@@ -122,6 +134,9 @@ class RecordingFragment : Fragment() {
                 it.putExtra(RecordingService.EXTRA_PAUSED, false)
             })
 
+            // Atualizar badge de armazenamento a cada 30s
+            if (++storageTickCount >= 30) { storageTickCount = 0; updateStorageBadge() }
+
             timerHandler.postDelayed(this, 1_000)
         }
     }
@@ -153,6 +168,8 @@ class RecordingFragment : Fragment() {
 
         videoManager = VideoCaptureManager(requireContext())
         binding.tvResolution.text = preset.videoResolution.label
+        updateAudioSourceBadge()
+        updateStorageBadge()
 
         audioEngine.onStats = { stats ->
             activity?.runOnUiThread {
@@ -410,11 +427,16 @@ class RecordingFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         if (orientationListener.canDetectOrientation()) orientationListener.enable()
+        @Suppress("DEPRECATION")
+        requireContext().registerReceiver(headsetReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
+        updateAudioSourceBadge()
+        updateStorageBadge()
     }
 
     override fun onPause() {
         super.onPause()
         orientationListener.disable()
+        requireContext().unregisterReceiver(headsetReceiver)
     }
 
     override fun onDestroyView() {
@@ -501,6 +523,50 @@ class RecordingFragment : Fragment() {
     }
 
     private fun sanitize(s: String) = s.replace(Regex("[^a-zA-Z0-9_\\-]"), "_").take(40)
+
+    private fun updateAudioSourceBadge() {
+        val b = _binding ?: return
+        val am = requireContext().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val inputs = am.getDevices(AudioManager.GET_DEVICES_INPUTS)
+        val hasExternal = inputs.any { d ->
+            d.type == AudioDeviceInfo.TYPE_WIRED_HEADSET ||
+            d.type == AudioDeviceInfo.TYPE_USB_HEADSET   ||
+            d.type == AudioDeviceInfo.TYPE_USB_DEVICE    ||
+            d.type == AudioDeviceInfo.TYPE_USB_ACCESSORY
+        }
+        val isUsb = inputs.any { d ->
+            d.type == AudioDeviceInfo.TYPE_USB_HEADSET ||
+            d.type == AudioDeviceInfo.TYPE_USB_DEVICE  ||
+            d.type == AudioDeviceInfo.TYPE_USB_ACCESSORY
+        }
+        b.tvAudioSource.text = when {
+            isUsb        -> "USB"
+            hasExternal  -> "MIC EXT"
+            else         -> "MIC INT"
+        }
+        b.tvAudioSource.setTextColor(
+            if (hasExternal) Color.parseColor("#EF9F27") else Color.parseColor("#999999")
+        )
+    }
+
+    private fun updateStorageBadge() {
+        val b = _binding ?: return
+        val path = requireContext().getExternalFilesDir(null)?.absolutePath
+            ?: Environment.getExternalStorageDirectory().absolutePath
+        val sf    = StatFs(path)
+        val total = sf.totalBytes
+        val free  = sf.availableBytes
+        val pct   = if (total > 0) (free * 100 / total).toInt() else 0
+        val freeGb = free.toDouble() / (1024.0 * 1024.0 * 1024.0)
+        b.tvStorage.text = "${"%.1f".format(freeGb)} GB · $pct%"
+        b.tvStorage.setTextColor(
+            when {
+                pct < 10 -> Color.parseColor("#FF4444")
+                pct < 25 -> Color.parseColor("#EF9F27")
+                else     -> Color.parseColor("#999999")
+            }
+        )
+    }
 
     companion object {
         const val ARG_PRESET_ID = "preset_id"

@@ -95,19 +95,58 @@
             android:fontFamily="monospace"
             android:visibility="gone" />
 
+    </LinearLayout>
+
+    <!-- Info row: resolução · fonte de áudio · armazenamento -->
+    <LinearLayout
+        android:id="@+id/info_row"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:layout_marginStart="14dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/top_bar"
+        app:layout_constraintStart_toStartOf="parent">
+
         <TextView
             android:id="@+id/tv_resolution"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
             android:background="#CC000000"
             android:paddingHorizontal="8dp"
-            android:paddingVertical="3dp"
-            android:text="1080p"
+            android:paddingVertical="2dp"
+            android:text="1080p / 30fps"
             android:textColor="@color/primary"
-            android:textSize="11sp"
+            android:textSize="10sp"
             android:textStyle="bold"
             android:letterSpacing="0.05" />
+
+        <TextView
+            android:id="@+id/tv_audio_source"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:background="#CC000000"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:text="MIC INT"
+            android:textColor="#999999"
+            android:textSize="10sp"
+            android:letterSpacing="0.05" />
+
+        <TextView
+            android:id="@+id/tv_storage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:background="#CC000000"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:text="—"
+            android:textColor="#999999"
+            android:textSize="10sp"
+            android:fontFamily="monospace" />
 
     </LinearLayout>
 
@@ -195,7 +234,7 @@
         android:maxLines="1"
         android:imeOptions="actionDone"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/top_bar"
+        app:layout_constraintTop_toBottomOf="@id/info_row"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
