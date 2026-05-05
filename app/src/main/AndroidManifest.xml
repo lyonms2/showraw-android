@@ -30,7 +30,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ShowRaw">
 
-        <!-- Launcher principal (Phase 3+) -->
+        <!-- Launcher -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -41,18 +41,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- Phase 1: prova de conceito de áudio (sem câmera) -->
-        <activity
-            android:name=".ui.phase1.Phase1Activity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-
-        <!-- Phase 2: standalone para testes -->
-        <activity
-            android:name=".ui.phase2.Phase2Activity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
 
         <!-- Serviço de gravação em foreground (wake lock + notificação) -->
         <service
