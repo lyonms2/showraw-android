@@ -11,6 +11,7 @@ import com.showraw.android.Navigator
 import com.showraw.android.databinding.FragmentSettingsBinding
 import com.showraw.android.presets.Preset
 import com.showraw.android.presets.Resolution
+import com.showraw.android.presets.defaultEqBands
 
 class SettingsFragment : Fragment() {
 
@@ -235,9 +236,7 @@ class SettingsFragment : Fragment() {
                 estimatedMbPerMin  = MB_PER_MIN[res] ?: 350,
                 contextualWarning  = null,
                 noiseGateThreshold = if (p.getBoolean(KEY_NG_ENABLED, false)) p.getFloat(KEY_NG_THR, -40f) else -60f,
-                eqLowGainDb        = p.getFloat  (KEY_EQ_LOW,         0f),
-                eqMidGainDb        = p.getFloat  (KEY_EQ_MID,         0f),
-                eqHighGainDb       = p.getFloat  (KEY_EQ_HIGH,        0f),
+                eqBands            = defaultEqBands(),
                 stabilization      = p.getBoolean(KEY_STAB,        false),
                 maxDurationMinutes = p.getInt    (KEY_MAX_DUR,          0),
             )
