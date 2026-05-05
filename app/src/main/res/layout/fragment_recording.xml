@@ -95,6 +95,20 @@
             android:fontFamily="monospace"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/tv_resolution"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="#CC000000"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="3dp"
+            android:text="1080p"
+            android:textColor="@color/primary"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05" />
+
     </LinearLayout>
 
     <!-- Headphone monitoring button — top-right, third from right -->
@@ -296,13 +310,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="LIMITER GR"
+                android:text="COMP GR"
                 android:textColor="@color/text_secondary"
                 android:textSize="10sp"
                 android:letterSpacing="0.1" />
 
             <TextView
-                android:id="@+id/tv_gr"
+                android:id="@+id/tv_comp_gr"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0.0 dB"
@@ -321,17 +335,20 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="PRESET"
+                android:text="LIM GR"
                 android:textColor="@color/text_secondary"
                 android:textSize="10sp"
                 android:letterSpacing="0.1" />
 
             <TextView
-                android:id="@+id/tv_preset_name"
+                android:id="@+id/tv_gr"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="0.0 dB"
                 android:textColor="@color/primary_light"
-                android:textSize="13sp" />
+                android:textSize="18sp"
+                android:fontFamily="monospace"
+                android:textStyle="bold" />
         </LinearLayout>
 
     </LinearLayout>

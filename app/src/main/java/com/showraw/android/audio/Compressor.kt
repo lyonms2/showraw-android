@@ -42,7 +42,7 @@ class Compressor {
     }
 
     fun gainReductionDb(): Float =
-        if (envelope < 1f) -20f * log10(envelope.coerceAtLeast(1e-6f)) else 0f
+        if (envelope < 1f) 20f * log10(envelope.coerceAtLeast(1e-6f)) else 0f
 
     fun processBuffer(buffer: FloatArray, size: Int) {
         if (!enabled) return

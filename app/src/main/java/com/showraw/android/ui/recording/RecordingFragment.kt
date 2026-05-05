@@ -152,7 +152,7 @@ class RecordingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         videoManager = VideoCaptureManager(requireContext())
-        binding.tvPresetName.text = "${preset.emoji} ${preset.name}"
+        binding.tvResolution.text = preset.videoResolution.label
 
         audioEngine.onStats = { stats ->
             activity?.runOnUiThread {
@@ -392,8 +392,9 @@ class RecordingFragment : Fragment() {
     private fun updateStats(stats: AudioStats) {
         val b = _binding ?: return
         val peak = stats.peakDbFs.coerceIn(-96f, 0f)
-        b.tvPeak.text = "${"%.1f".format(peak)} dBFS"
-        b.tvGr.text   = "${"%.1f".format(stats.gainReductionDb)} dB"
+        b.tvPeak.text   = "${"%.1f".format(peak)} dBFS"
+        b.tvGr.text     = "${"%.1f".format(stats.gainReductionDb)} dB"
+        b.tvCompGr.text = "${"%.1f".format(stats.compressorGrDb)} dB"
 
         val progress = (96 + peak).toInt().coerceIn(0, 96)
         b.vuBar.progress = progress

@@ -20,8 +20,9 @@ import kotlin.math.sqrt
 data class AudioStats(
     val rms: Float,
     val peakDbFs: Float,
-    val gainReductionDb: Float,
-    val isClipping: Boolean,    // pico > -1 dBFS por > 2s consecutivos
+    val gainReductionDb: Float,     // limiter GR (negativo em dB)
+    val compressorGrDb: Float,      // compressor GR (negativo em dB)
+    val isClipping: Boolean,        // pico > -1 dBFS por > 2s consecutivos
 )
 
 /**
@@ -123,9 +124,10 @@ class AudioEngine {
                 limiter.processBuffer(floatBuf, read)     // 5. Teto absoluto de amplitude
 
                 // ── Estatísticas (medidas no sinal final, antes da conversão) ─
-                val rms  = computeRms(floatBuf, read)
-                val peak = computePeakDbFs(floatBuf, read)
-                val gr   = limiter.gainReductionDb()
+                val rms    = computeRms(floatBuf, read)
+                val peak   = computePeakDbFs(floatBuf, read)
+                val gr     = limiter.gainReductionDb()
+                val compGr = compressor.gainReductionDb()
 
                 // ── Float → Short (única conversão de saída) ────────────────
                 for (i in 0 until read) {
@@ -146,7 +148,7 @@ class AudioEngine {
                     false
                 }
 
-                onStats?.invoke(AudioStats(rms, peak, gr, clipping))
+                onStats?.invoke(AudioStats(rms, peak, gr, compGr, clipping))
                 onBufferReady?.invoke(shortBuf.copyOf(read), read)
             }
         }
