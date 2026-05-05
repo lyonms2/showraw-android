@@ -47,8 +47,12 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.lifecycle.lifecycleScope
 import kotlin.math.abs
 import kotlin.math.pow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RecordingFragment : Fragment() {
 
@@ -116,9 +120,11 @@ class RecordingFragment : Fragment() {
             val secs     = elapsed / 1000
             _binding?.tvTimer?.text = "%02d:%02d".format(secs / 60, secs % 60)
 
-            val totalSecs  = freeMbAtStart * 60L / preset.estimatedMbPerMin
-            val remainSecs = (totalSecs - secs).coerceAtLeast(0L)
-            _binding?.tvTimeRemaining?.text = "−%02d:%02d".format(remainSecs / 60, remainSecs % 60)
+            if (preset.estimatedMbPerMin > 0) {
+                val totalSecs  = freeMbAtStart * 60L / preset.estimatedMbPerMin
+                val remainSecs = (totalSecs - secs).coerceAtLeast(0L)
+                _binding?.tvTimeRemaining?.text = "−%02d:%02d".format(remainSecs / 60, remainSecs % 60)
+            }
 
             val maxMs = preset.maxDurationMinutes * 60_000L
             if (maxMs > 0 && elapsed >= maxMs) {
@@ -404,6 +410,14 @@ class RecordingFragment : Fragment() {
         binding.tvZoomLevel.visibility   = View.GONE
         updateStabilizationButton()
         updateZoomButtons(1.0f)
+        updateZoom05Button()
+    }
+
+    private fun updateZoom05Button() {
+        val minZoom = videoManager.getCameraInfo()?.zoomState?.value?.minZoomRatio ?: 1.0f
+        val supported = minZoom < 0.9f
+        binding.btnZoom05.isEnabled = supported
+        binding.btnZoom05.alpha     = if (supported) 1f else 0.4f
     }
 
     // ── Recording control ─────────────────────────────────────────────────────
@@ -571,22 +585,28 @@ class RecordingFragment : Fragment() {
     }
 
     private fun updateStorageBadge() {
-        val b = _binding ?: return
-        val path = requireContext().getExternalFilesDir(null)?.absolutePath
-            ?: Environment.getExternalStorageDirectory().absolutePath
-        val sf    = StatFs(path)
-        val total = sf.totalBytes
-        val free  = sf.availableBytes
-        val pct   = if (total > 0) (free * 100 / total).toInt() else 0
-        val freeGb = free.toDouble() / (1024.0 * 1024.0 * 1024.0)
-        b.tvStorage.text = "${"%.1f".format(freeGb)} GB · $pct%"
-        b.tvStorage.setTextColor(
-            when {
-                pct < 10 -> Color.parseColor("#FF4444")
-                pct < 25 -> Color.parseColor("#EF9F27")
-                else     -> Color.parseColor("#999999")
-            }
-        )
+        val ctx = context ?: return
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val path  = ctx.getExternalFilesDir(null)?.absolutePath
+                    ?: Environment.getExternalStorageDirectory().absolutePath
+                val sf    = StatFs(path)
+                val total = sf.totalBytes
+                val free  = sf.availableBytes
+                val pct   = if (total > 0) (free * 100L / total).toInt() else 0
+                val freeGb = free.toDouble() / (1024.0 * 1024.0 * 1024.0)
+                val text  = String.format(java.util.Locale.US, "%.1f GB · %d%%", freeGb, pct)
+                val color = when {
+                    pct < 10 -> Color.parseColor("#FF4444")
+                    pct < 25 -> Color.parseColor("#EF9F27")
+                    else     -> Color.parseColor("#999999")
+                }
+                withContext(Dispatchers.Main) {
+                    _binding?.tvStorage?.text = text
+                    _binding?.tvStorage?.setTextColor(color)
+                }
+            } catch (_: Exception) { }
+        }
     }
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
