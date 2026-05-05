@@ -277,54 +277,144 @@
         <View android:layout_width="match_parent" android:layout_height="1dp"
             android:background="#2A2A2A" android:layout_marginBottom="20dp" />
 
-        <!-- ── EQUALIZADOR ────────────────────────────────── -->
+        <!-- ── EQUALIZADOR PARAMÉTRICO ───────────────────── -->
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="EQUALIZADOR" android:textColor="#999999"
-            android:textSize="11sp" android:letterSpacing="0.12" android:layout_marginBottom="14dp" />
+            android:text="EQUALIZADOR PARAMÉTRICO" android:textColor="#999999"
+            android:textSize="11sp" android:letterSpacing="0.12" android:layout_marginBottom="12dp" />
+
+        <!-- Curva de resposta em frequência -->
+        <com.showraw.android.ui.views.EqCurveView
+            android:id="@+id/eq_curve_view"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Band 1: Low Shelf -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="BANDA 1 — LOW SHELF" android:textColor="#666666"
+            android:textSize="10sp" android:letterSpacing="0.1" android:layout_marginBottom="8dp" />
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:gravity="center_vertical">
             <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="Graves  (200 Hz)"
+                android:layout_weight="1" android:text="Frequência"
                 android:textColor="@color/white" android:textSize="13sp" />
-            <TextView android:id="@+id/tv_eq_low_val"
+            <TextView android:id="@+id/tv_eq_low_freq"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="200 Hz" android:textColor="@color/primary"
+                android:textSize="13sp" android:fontFamily="monospace" />
+        </LinearLayout>
+        <SeekBar android:id="@+id/sb_eq_low_freq"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:layout_marginBottom="10dp"
+            android:max="100" android:progress="38"
+            android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Ganho"
+                android:textColor="@color/white" android:textSize="13sp" />
+            <TextView android:id="@+id/tv_eq_low_gain"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="0 dB" android:textColor="@color/primary"
                 android:textSize="13sp" android:fontFamily="monospace" />
         </LinearLayout>
-        <SeekBar android:id="@+id/sb_eq_low"
+        <SeekBar android:id="@+id/sb_eq_low_gain"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:layout_marginBottom="14dp"
+            android:layout_marginTop="4dp" android:layout_marginBottom="16dp"
+            android:max="24" android:progress="12"
+            android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+
+        <!-- Band 2: Peaking (Mid) -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="BANDA 2 — PEAKING (MID)" android:textColor="#666666"
+            android:textSize="10sp" android:letterSpacing="0.1" android:layout_marginBottom="8dp" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Frequência"
+                android:textColor="@color/white" android:textSize="13sp" />
+            <TextView android:id="@+id/tv_eq_mid_freq"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="1.0 kHz" android:textColor="@color/primary"
+                android:textSize="13sp" android:fontFamily="monospace" />
+        </LinearLayout>
+        <SeekBar android:id="@+id/sb_eq_mid_freq"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:layout_marginBottom="10dp"
+            android:max="100" android:progress="43"
+            android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Ganho"
+                android:textColor="@color/white" android:textSize="13sp" />
+            <TextView android:id="@+id/tv_eq_mid_gain"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="0 dB" android:textColor="@color/primary"
+                android:textSize="13sp" android:fontFamily="monospace" />
+        </LinearLayout>
+        <SeekBar android:id="@+id/sb_eq_mid_gain"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:layout_marginBottom="10dp"
             android:max="24" android:progress="12"
             android:progressTint="@color/primary" android:thumbTint="@color/primary" />
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:gravity="center_vertical">
             <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="Médios  (1 kHz)"
+                android:layout_weight="1" android:text="Q (largura de banda)"
                 android:textColor="@color/white" android:textSize="13sp" />
-            <TextView android:id="@+id/tv_eq_mid_val"
+            <TextView android:id="@+id/tv_eq_mid_q"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="0 dB" android:textColor="@color/primary"
+                android:text="0.7" android:textColor="@color/primary"
                 android:textSize="13sp" android:fontFamily="monospace" />
         </LinearLayout>
-        <SeekBar android:id="@+id/sb_eq_mid"
+        <SeekBar android:id="@+id/sb_eq_mid_q"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:layout_marginBottom="14dp"
-            android:max="24" android:progress="12"
+            android:layout_marginTop="4dp" android:layout_marginBottom="4dp"
+            android:max="27" android:progress="4"
+            android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="Q baixo (0.3) = banda larga e suave  ·  Q alto (3.0) = banda estreita e cirúrgica"
+            android:textColor="#555555" android:textSize="11sp" />
+
+        <!-- Band 3: High Shelf -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="BANDA 3 — HIGH SHELF" android:textColor="#666666"
+            android:textSize="10sp" android:letterSpacing="0.1" android:layout_marginBottom="8dp" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Frequência"
+                android:textColor="@color/white" android:textSize="13sp" />
+            <TextView android:id="@+id/tv_eq_high_freq"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="8.0 kHz" android:textColor="@color/primary"
+                android:textSize="13sp" android:fontFamily="monospace" />
+        </LinearLayout>
+        <SeekBar android:id="@+id/sb_eq_high_freq"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:layout_marginBottom="10dp"
+            android:max="100" android:progress="69"
             android:progressTint="@color/primary" android:thumbTint="@color/primary" />
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:gravity="center_vertical">
             <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="Agudos  (8 kHz)"
+                android:layout_weight="1" android:text="Ganho"
                 android:textColor="@color/white" android:textSize="13sp" />
-            <TextView android:id="@+id/tv_eq_high_val"
+            <TextView android:id="@+id/tv_eq_high_gain"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="0 dB" android:textColor="@color/primary"
                 android:textSize="13sp" android:fontFamily="monospace" />
         </LinearLayout>
-        <SeekBar android:id="@+id/sb_eq_high"
+        <SeekBar android:id="@+id/sb_eq_high_gain"
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="4dp" android:layout_marginBottom="20dp"
             android:max="24" android:progress="12"

@@ -9,9 +9,14 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.showraw.android.databinding.FragmentCustomPresetEditorBinding
 import com.showraw.android.presets.CustomPresetStore
+import com.showraw.android.presets.EqBand
+import com.showraw.android.presets.EqFilterType
 import com.showraw.android.presets.Preset
 import com.showraw.android.presets.Resolution
 import java.util.UUID
+import kotlin.math.log2
+import kotlin.math.pow
+import kotlin.math.roundToInt
 
 class CustomPresetEditorFragment : Fragment() {
 
@@ -19,7 +24,12 @@ class CustomPresetEditorFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var editingPreset: Preset? = null
-    private val ratios = listOf(1.5f, 2f, 2.5f, 3f, 4f, 6f, 8f, 10f)
+    private val compRatios = listOf(1.5f, 2f, 2.5f, 3f, 4f, 6f, 8f, 10f)
+
+    // Frequency ranges for each EQ band (log-mapped SeekBar 0–100)
+    private val LOW_FREQ_MIN  =  40f;  private val LOW_FREQ_MAX  =   800f
+    private val MID_FREQ_MIN  = 200f;  private val MID_FREQ_MAX  = 8_000f
+    private val HIGH_FREQ_MIN = 1_000f; private val HIGH_FREQ_MAX = 20_000f
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
@@ -41,21 +51,25 @@ class CustomPresetEditorFragment : Fragment() {
             populate(editingPreset!!)
         } else {
             updateAllLabels()
+            refreshCurve()
         }
 
         setupSeekBars()
         binding.btnSavePreset.setOnClickListener { savePreset() }
     }
 
+    // ── Populate from existing preset ───────────────────────────────
+
     private fun populate(p: Preset) {
         binding.etPresetEmoji.setText(p.emoji)
         binding.etPresetName.setText(p.name)
+
         binding.sbGain.progress          = p.inputGainDb.toInt().coerceIn(0, 30)
         binding.sbThreshold.progress     = (-p.limiterThreshold - 1).toInt().coerceIn(0, 19)
         binding.sbAttack.progress        = (p.limiterAttack - 1).toInt().coerceIn(0, 49)
         binding.sbRelease.progress       = (p.limiterRelease - 20).toInt().coerceIn(0, 480)
         binding.sbCompThreshold.progress = (-p.compressorThreshold - 6).toInt().coerceIn(0, 34)
-        val ratioIdx = ratios.indexOfFirst { it == p.compressorRatio }.takeIf { it >= 0 } ?: 3
+        val ratioIdx = compRatios.indexOfFirst { it == p.compressorRatio }.takeIf { it >= 0 } ?: 3
         binding.sbCompRatio.progress     = ratioIdx
         binding.sbCompMakeup.progress    = p.compressorMakeupDb.toInt().coerceIn(0, 18)
         binding.sbHpfFreq.progress       = (p.hpfFrequency - 80).toInt().coerceIn(0, 170)
@@ -64,11 +78,26 @@ class CustomPresetEditorFragment : Fragment() {
             24   -> binding.rgRolloff.check(binding.rbRolloff24.id)
             else -> binding.rgRolloff.check(binding.rbRolloff18.id)
         }
-        binding.sbEqLow.progress  = (p.eqLowGainDb  + 12).toInt().coerceIn(0, 24)
-        binding.sbEqMid.progress  = (p.eqMidGainDb  + 12).toInt().coerceIn(0, 24)
-        binding.sbEqHigh.progress = (p.eqHighGainDb + 12).toInt().coerceIn(0, 24)
+
+        val low  = p.eqBands.firstOrNull { it.type == EqFilterType.LOW_SHELF }
+        val mid  = p.eqBands.firstOrNull { it.type == EqFilterType.PEAKING }
+        val high = p.eqBands.firstOrNull { it.type == EqFilterType.HIGH_SHELF }
+        low?.let {
+            binding.sbEqLowFreq.progress  = freqToProgress(it.freq, LOW_FREQ_MIN, LOW_FREQ_MAX)
+            binding.sbEqLowGain.progress  = (it.gainDb + 12).toInt().coerceIn(0, 24)
+        }
+        mid?.let {
+            binding.sbEqMidFreq.progress  = freqToProgress(it.freq, MID_FREQ_MIN, MID_FREQ_MAX)
+            binding.sbEqMidGain.progress  = (it.gainDb + 12).toInt().coerceIn(0, 24)
+            binding.sbEqMidQ.progress     = ((it.q - 0.3f) / 0.1f).roundToInt().coerceIn(0, 27)
+        }
+        high?.let {
+            binding.sbEqHighFreq.progress = freqToProgress(it.freq, HIGH_FREQ_MIN, HIGH_FREQ_MAX)
+            binding.sbEqHighGain.progress = (it.gainDb + 12).toInt().coerceIn(0, 24)
+        }
+
         val gateEnabled = p.noiseGateThreshold > -59f
-        binding.swNoiseGate.isChecked = gateEnabled
+        binding.swNoiseGate.isChecked  = gateEnabled
         binding.sbNgThreshold.progress = (-p.noiseGateThreshold - 21).toInt().coerceIn(0, 39)
         binding.swStabilization.isChecked = p.stabilization
         when (p.videoResolution) {
@@ -78,12 +107,15 @@ class CustomPresetEditorFragment : Fragment() {
             Resolution.R1080P_60 -> binding.rgResolution.check(binding.rbRes1080p60.id)
         }
         updateAllLabels()
+        refreshCurve()
     }
+
+    // ── SeekBar listeners ────────────────────────────────────────────
 
     private fun setupSeekBars() {
         fun onChange(bar: SeekBar, update: (Int) -> Unit) {
             bar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(sb: SeekBar, p: Int, fromUser: Boolean) = update(p)
+                override fun onProgressChanged(sb: SeekBar, p: Int, fromUser: Boolean) { update(p); if (fromUser) refreshCurve() }
                 override fun onStartTrackingTouch(sb: SeekBar) = Unit
                 override fun onStopTrackingTouch(sb: SeekBar) = Unit
             })
@@ -93,13 +125,19 @@ class CustomPresetEditorFragment : Fragment() {
         onChange(binding.sbAttack)        { v -> binding.tvAttackVal.text       = "${v + 1} ms" }
         onChange(binding.sbRelease)       { v -> binding.tvReleaseVal.text      = "${v + 20} ms" }
         onChange(binding.sbCompThreshold) { v -> binding.tvCompThresholdVal.text = "${-(v + 6)} dBFS" }
-        onChange(binding.sbCompRatio)     { v -> binding.tvCompRatioVal.text    = "${ratios[v]}:1" }
+        onChange(binding.sbCompRatio)     { v -> binding.tvCompRatioVal.text    = "${compRatios[v]}:1" }
         onChange(binding.sbCompMakeup)    { v -> binding.tvCompMakeupVal.text   = if (v == 0) "0 dB" else "+$v dB" }
         onChange(binding.sbHpfFreq)       { v -> binding.tvHpfFreqVal.text      = "${v + 80} Hz" }
-        onChange(binding.sbEqLow)         { v -> binding.tvEqLowVal.text        = fmtDb(v - 12) }
-        onChange(binding.sbEqMid)         { v -> binding.tvEqMidVal.text        = fmtDb(v - 12) }
-        onChange(binding.sbEqHigh)        { v -> binding.tvEqHighVal.text       = fmtDb(v - 12) }
         onChange(binding.sbNgThreshold)   { v -> binding.tvNgThresholdVal.text  = "${-(v + 21)} dBFS" }
+
+        // EQ parametric
+        onChange(binding.sbEqLowFreq)  { v -> binding.tvEqLowFreq.text  = fmtFreq(progressToFreq(v, LOW_FREQ_MIN, LOW_FREQ_MAX)) }
+        onChange(binding.sbEqLowGain)  { v -> binding.tvEqLowGain.text  = fmtDb(v - 12) }
+        onChange(binding.sbEqMidFreq)  { v -> binding.tvEqMidFreq.text  = fmtFreq(progressToFreq(v, MID_FREQ_MIN, MID_FREQ_MAX)) }
+        onChange(binding.sbEqMidGain)  { v -> binding.tvEqMidGain.text  = fmtDb(v - 12) }
+        onChange(binding.sbEqMidQ)     { v -> binding.tvEqMidQ.text     = "%.1f".format(0.3f + v * 0.1f) }
+        onChange(binding.sbEqHighFreq) { v -> binding.tvEqHighFreq.text = fmtFreq(progressToFreq(v, HIGH_FREQ_MIN, HIGH_FREQ_MAX)) }
+        onChange(binding.sbEqHighGain) { v -> binding.tvEqHighGain.text = fmtDb(v - 12) }
     }
 
     private fun updateAllLabels() {
@@ -109,17 +147,45 @@ class CustomPresetEditorFragment : Fragment() {
         binding.tvAttackVal.text        = "${binding.sbAttack.progress + 1} ms"
         binding.tvReleaseVal.text       = "${binding.sbRelease.progress + 20} ms"
         binding.tvCompThresholdVal.text = "${-(binding.sbCompThreshold.progress + 6)} dBFS"
-        binding.tvCompRatioVal.text     = "${ratios[binding.sbCompRatio.progress]}:1"
+        binding.tvCompRatioVal.text     = "${compRatios[binding.sbCompRatio.progress]}:1"
         val mk = binding.sbCompMakeup.progress
         binding.tvCompMakeupVal.text    = if (mk == 0) "0 dB" else "+$mk dB"
         binding.tvHpfFreqVal.text       = "${binding.sbHpfFreq.progress + 80} Hz"
-        binding.tvEqLowVal.text         = fmtDb(binding.sbEqLow.progress  - 12)
-        binding.tvEqMidVal.text         = fmtDb(binding.sbEqMid.progress  - 12)
-        binding.tvEqHighVal.text        = fmtDb(binding.sbEqHigh.progress - 12)
         binding.tvNgThresholdVal.text   = "${-(binding.sbNgThreshold.progress + 21)} dBFS"
+
+        binding.tvEqLowFreq.text  = fmtFreq(progressToFreq(binding.sbEqLowFreq.progress,  LOW_FREQ_MIN,  LOW_FREQ_MAX))
+        binding.tvEqLowGain.text  = fmtDb(binding.sbEqLowGain.progress  - 12)
+        binding.tvEqMidFreq.text  = fmtFreq(progressToFreq(binding.sbEqMidFreq.progress,  MID_FREQ_MIN,  MID_FREQ_MAX))
+        binding.tvEqMidGain.text  = fmtDb(binding.sbEqMidGain.progress  - 12)
+        binding.tvEqMidQ.text     = "%.1f".format(0.3f + binding.sbEqMidQ.progress * 0.1f)
+        binding.tvEqHighFreq.text = fmtFreq(progressToFreq(binding.sbEqHighFreq.progress, HIGH_FREQ_MIN, HIGH_FREQ_MAX))
+        binding.tvEqHighGain.text = fmtDb(binding.sbEqHighGain.progress - 12)
     }
 
+    private fun refreshCurve() {
+        binding.eqCurveView.setBands(buildEqBands())
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────────
+
+    private fun progressToFreq(p: Int, min: Float, max: Float) =
+        min * (max / min).pow(p / 100.0).toFloat()
+
+    private fun freqToProgress(freq: Float, min: Float, max: Float) =
+        (log2(freq / min) / log2(max / min) * 100).roundToInt().coerceIn(0, 100)
+
+    private fun fmtFreq(f: Float) =
+        if (f >= 1000f) "${"%.1f".format(f / 1000f)} kHz" else "${f.roundToInt()} Hz"
+
     private fun fmtDb(v: Int) = if (v >= 0) "+$v dB" else "$v dB"
+
+    private fun buildEqBands() = listOf(
+        EqBand(EqFilterType.LOW_SHELF,  progressToFreq(binding.sbEqLowFreq.progress,  LOW_FREQ_MIN,  LOW_FREQ_MAX),  (binding.sbEqLowGain.progress  - 12).toFloat(), 0.707f),
+        EqBand(EqFilterType.PEAKING,    progressToFreq(binding.sbEqMidFreq.progress,  MID_FREQ_MIN,  MID_FREQ_MAX),  (binding.sbEqMidGain.progress  - 12).toFloat(), 0.3f + binding.sbEqMidQ.progress * 0.1f),
+        EqBand(EqFilterType.HIGH_SHELF, progressToFreq(binding.sbEqHighFreq.progress, HIGH_FREQ_MIN, HIGH_FREQ_MAX), (binding.sbEqHighGain.progress - 12).toFloat(), 0.707f),
+    )
+
+    // ── Save ─────────────────────────────────────────────────────────
 
     private fun savePreset() {
         val name = binding.etPresetName.text.toString().trim()
@@ -127,14 +193,14 @@ class CustomPresetEditorFragment : Fragment() {
             Toast.makeText(requireContext(), "Digite um nome para o preset.", Toast.LENGTH_SHORT).show()
             return
         }
-        val emoji = binding.etPresetEmoji.text.toString().trim().ifEmpty { "🎵" }
+        val emoji      = binding.etPresetEmoji.text.toString().trim().ifEmpty { "🎵" }
         val resolution = when (binding.rgResolution.checkedRadioButtonId) {
             binding.rbRes4k60.id    -> Resolution.R4K_60
             binding.rbRes1080p30.id -> Resolution.R1080P_30
             binding.rbRes1080p60.id -> Resolution.R1080P_60
             else                    -> Resolution.R4K_30
         }
-        val rolloff = when (binding.rgRolloff.checkedRadioButtonId) {
+        val rolloff    = when (binding.rgRolloff.checkedRadioButtonId) {
             binding.rbRolloff12.id -> 12
             binding.rbRolloff24.id -> 24
             else                   -> 18
@@ -142,7 +208,7 @@ class CustomPresetEditorFragment : Fragment() {
         val ngThreshold = if (binding.swNoiseGate.isChecked)
             -(binding.sbNgThreshold.progress + 21).toFloat() else -60f
 
-        val preset = Preset(
+        CustomPresetStore.save(requireContext(), Preset(
             id                  = editingPreset?.id ?: UUID.randomUUID().toString(),
             name                = name,
             emoji               = emoji,
@@ -156,19 +222,16 @@ class CustomPresetEditorFragment : Fragment() {
             estimatedMbPerMin   = resolution.estimatedMb(),
             contextualWarning   = null,
             noiseGateThreshold  = ngThreshold,
-            eqLowGainDb         = (binding.sbEqLow.progress  - 12).toFloat(),
-            eqMidGainDb         = (binding.sbEqMid.progress  - 12).toFloat(),
-            eqHighGainDb        = (binding.sbEqHigh.progress - 12).toFloat(),
+            eqBands             = buildEqBands(),
             stabilization       = binding.swStabilization.isChecked,
             inputGainDb         = binding.sbGain.progress.toFloat(),
             compressorThreshold = -(binding.sbCompThreshold.progress + 6).toFloat(),
-            compressorRatio     = ratios[binding.sbCompRatio.progress],
+            compressorRatio     = compRatios[binding.sbCompRatio.progress],
             compressorAttack    = 20f,
             compressorRelease   = 150f,
             compressorMakeupDb  = binding.sbCompMakeup.progress.toFloat(),
             maxDurationMinutes  = 0,
-        )
-        CustomPresetStore.save(requireContext(), preset)
+        ))
         Toast.makeText(requireContext(), "Preset \"$name\" salvo!", Toast.LENGTH_SHORT).show()
         @Suppress("DEPRECATION")
         requireActivity().onBackPressed()
@@ -181,7 +244,6 @@ class CustomPresetEditorFragment : Fragment() {
 
     companion object {
         const val ARG_PRESET_ID = "preset_id"
-
         fun newInstance(presetId: String? = null) = CustomPresetEditorFragment().apply {
             if (presetId != null) arguments = Bundle().apply { putString(ARG_PRESET_ID, presetId) }
         }

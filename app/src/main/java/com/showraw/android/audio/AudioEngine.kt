@@ -65,11 +65,7 @@ class AudioEngine {
     fun configure(preset: Preset) {
         preGainFactor = 10.0.pow(preset.inputGainDb / 20.0).toFloat()
         hpf.configure(preset.hpfFrequency, preset.hpfRolloff)
-        equalizer.configure(
-            lowGainDb  = preset.eqLowGainDb,
-            midGainDb  = preset.eqMidGainDb,
-            highGainDb = preset.eqHighGainDb,
-        )
+        equalizer.configure(preset.eqBands)
         noiseGate.configure(preset.noiseGateThreshold)
         compressor.configure(
             thresholdDb  = preset.compressorThreshold,

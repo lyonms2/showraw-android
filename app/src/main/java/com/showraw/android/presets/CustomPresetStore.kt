@@ -48,9 +48,7 @@ object CustomPresetStore {
         put("videoResolution",      videoResolution.name)
         put("estimatedMbPerMin",    estimatedMbPerMin)
         put("noiseGateThreshold",   noiseGateThreshold)
-        put("eqLowGainDb",          eqLowGainDb)
-        put("eqMidGainDb",          eqMidGainDb)
-        put("eqHighGainDb",         eqHighGainDb)
+        put("eqBands",              JSONArray(eqBands.map { it.toJson() }))
         put("stabilization",        stabilization)
         put("inputGainDb",          inputGainDb)
         put("compressorThreshold",  compressorThreshold)
@@ -59,6 +57,13 @@ object CustomPresetStore {
         put("compressorRelease",    compressorRelease)
         put("compressorMakeupDb",   compressorMakeupDb)
         put("maxDurationMinutes",   maxDurationMinutes)
+    }
+
+    private fun EqBand.toJson() = JSONObject().apply {
+        put("type",   type.name)
+        put("freq",   freq)
+        put("gainDb", gainDb)
+        put("q",      q)
     }
 
     private fun JSONObject.toPreset(): Preset {
@@ -77,9 +82,11 @@ object CustomPresetStore {
             estimatedMbPerMin   = getInt("estimatedMbPerMin"),
             contextualWarning   = null,
             noiseGateThreshold  = getDouble("noiseGateThreshold").toFloat(),
-            eqLowGainDb         = getDouble("eqLowGainDb").toFloat(),
-            eqMidGainDb         = getDouble("eqMidGainDb").toFloat(),
-            eqHighGainDb        = getDouble("eqHighGainDb").toFloat(),
+            eqBands             = run {
+                val arr = optJSONArray("eqBands")
+                if (arr != null) (0 until arr.length()).map { arr.getJSONObject(it).toEqBand() }
+                else defaultEqBands()
+            },
             stabilization       = getBoolean("stabilization"),
             inputGainDb         = getDouble("inputGainDb").toFloat(),
             compressorThreshold = getDouble("compressorThreshold").toFloat(),
@@ -90,4 +97,11 @@ object CustomPresetStore {
             maxDurationMinutes  = getInt("maxDurationMinutes"),
         )
     }
+
+    private fun JSONObject.toEqBand() = EqBand(
+        type   = EqFilterType.valueOf(getString("type")),
+        freq   = getDouble("freq").toFloat(),
+        gainDb = getDouble("gainDb").toFloat(),
+        q      = getDouble("q").toFloat(),
+    )
 }
