@@ -110,7 +110,27 @@ Frequência de corte típica:
   180 Hz — ambientes ruidosos / vento moderado
   250 Hz — vento forte (corte mais agressivo)
 
-Rolloff 12 dB/oitava é suave e musical; 24 dB/oitava é mais cirúrgico.""")
+Rolloff 12 dB/oitava é suave e musical; 24 dB/oitava é mais cirúrgico.
+
+──────────────────────────────────────────
+RUÍDO DE MANEJO (chiado da mão no celular)
+──────────────────────────────────────────
+Segurar o celular transmite vibração diretamente ao microfone. O resultado são dois tipos de ruído:
+
+▸ Rumble de baixa frequência (abaixo de 80 Hz)
+  Causado pela pressão dos dedos e microvibrações do aparelho.
+  O HPF a 80 Hz elimina praticamente todo esse componente sem afetar a gravação — o bumbo e o contrabaixo ficam intactos.
+
+▸ Chiado de alta frequência (1–8 kHz)
+  Causado pelo atrito dos dedos deslizando na superfície do aparelho.
+  Não existe filtro eficaz para esse componente — ele ocorre na mesma faixa dos instrumentos e da voz.
+
+Como melhorar:
+  • Segure firme e evite reposicionar a mão durante a gravação
+  • Use um tripé ou suporte — elimina 100% do ruído de manejo
+  • Use uma gaiola/rig de celular — isola o aparelho da mão
+  • Use microfone externo — sai completamente da equação""")
+
 
         addSection(root, "🎛 EQ — Equalizador",
             """O EQ de 3 bandas permite ajustar o equilíbrio tonal do áudio capturado.

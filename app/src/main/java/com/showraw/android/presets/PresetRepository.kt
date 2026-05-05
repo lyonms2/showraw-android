@@ -6,9 +6,9 @@ object PresetRepository {
 
         Preset(
             id = "show", name = "Show / Concerto", emoji = "🎸",
-            description = "Ambientes de show com volume alto. Limiter agressivo, HPF 120Hz.",
+            description = "Ambientes de show com volume alto. Limiter agressivo, HPF 80Hz preserva graves.",
             limiterThreshold = -6f, limiterAttack = 5f, limiterRelease = 80f,
-            hpfFrequency = 120f, hpfRolloff = 18,
+            hpfFrequency = 80f, hpfRolloff = 18,
             videoResolution = Resolution.R4K_30, estimatedMbPerMin = 350,
             contextualWarning = null,
             stabilization = true,
@@ -24,7 +24,7 @@ object PresetRepository {
             id = "sport", name = "Esporte / Estádio", emoji = "🏟️",
             description = "Multidões, torcida, arquibancada. Alta taxa de quadros para movimento.",
             limiterThreshold = -8f, limiterAttack = 8f, limiterRelease = 100f,
-            hpfFrequency = 100f, hpfRolloff = 18,
+            hpfFrequency = 80f, hpfRolloff = 18,
             videoResolution = Resolution.R4K_60, estimatedMbPerMin = 600,
             contextualWarning = "Gera ~600 MB/min. Verifique o espaço disponível.",
             stabilization = true,
