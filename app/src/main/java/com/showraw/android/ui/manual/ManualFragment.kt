@@ -56,15 +56,21 @@ class ManualFragment : Fragment() {
         })
 
         addSection(root, "🎚 Presets",
-            """Cada preset é um perfil de gravação otimizado para um cenário específico.
+            """Há 3 presets essenciais + o modo Manual para configuração livre:
 
-• Show / Palco — limiter agressivo, HPF alto para cortar ruído de palco.
-• Entrevista — equilíbrio de voz, noise gate suave, HPF em 80 Hz.
-• Outdoor — HPF alto para vento, limiter rápido.
-• Vlog — som natural com correção suave.
-• Reunião — noise gate forte, ganho conservador.
-• Modo Pro — você configura cada parâmetro manualmente em Ajustes Avançados.
-• Presets Personalizados — crie seus próprios perfis de DSP (veja Modo Pro).
+🎸 Show / Ao Vivo
+  Concertos, shows, estádios, festivais. Ganho alto (+12 dB), limiter agressivo, graves preservados (HPF 80 Hz), compressor 4:1.
+
+🎤 Voz / Vlog
+  Vlog, entrevista, palestra, conversa. Ganho moderado (+9 dB), EQ com presença de voz (+2 dB mid), 1080p para economizar espaço.
+
+🌿 Externo / Vento
+  Rua, natureza, viagem — ambientes com vento. HPF 150 Hz com corte de 24 dB/oitava para eliminar rajadas. Não use para shows ao ar livre (graves seriam cortados — use Show / Ao Vivo para isso).
+
+🎛️ Manual (Pro)
+  Ponto de partida neutro para criar seus próprios presets. Todos os parâmetros em zero/default, sem processamento ativo.
+
+Presets personalizados: role até o final da grade e toque em "+ Novo Preset" para criar um perfil com seu nome e emoji. Pressione e segure um preset personalizado para editar ou excluir.
 
 O nome e o emoji do preset ativo aparecem no canto inferior direito da tela de gravação.""")
 
