@@ -11,8 +11,9 @@ import kotlin.math.pow
  * Peak limiter brick-wall com lookahead de 5ms.
  * O lookahead funciona via delay buffer: o ganho é computado olhando o sinal
  * FUTURO (240 frames à frente) e aplicado no sinal ATRASADO — garantindo que
- * o gain já está reduzido quando o transiente chega na saída.
- * Processar em thread de alta prioridade — nunca na main thread.
+ * o ganho já está reduzido quando o transiente chega na saída.
+ *
+ * Operar em FloatArray: sem conversão int16 intermediária, sem hard-clip parcial.
  */
 class Limiter(
     private var thresholdDbFs: Float = -6f,
@@ -23,9 +24,8 @@ class Limiter(
 ) {
     private var gainReduction = 1f
 
-    // Stereo: lookaheadFrames pares L/R = lookaheadFrames * 2 shorts
     private val lookaheadFrames = (lookaheadMs * sampleRate / 1000f).toInt()  // 240 @ 48kHz
-    private val delayBuf = ShortArray(lookaheadFrames * 2)
+    private val delayBuf = FloatArray(lookaheadFrames * 2)
     private var delayPos = 0
 
     private val threshold    get() = dbToLinear(thresholdDbFs)
@@ -37,11 +37,11 @@ class Limiter(
         this.attackMs      = attackMs
         this.releaseMs     = releaseMs
         gainReduction = 1f
-        delayBuf.fill(0)
+        delayBuf.fill(0f)
         delayPos = 0
     }
 
-    fun processBuffer(buffer: ShortArray, size: Int) {
+    fun processBuffer(buffer: FloatArray, size: Int) {
         val thr      = threshold
         val attack   = attackCoeff
         val release  = releaseCoeff
@@ -49,10 +49,9 @@ class Limiter(
 
         var i = 0
         while (i + 1 < size) {
-            // Amostra futura (lookahead) — usada para calcular gain necessário agora
             val futureL = buffer[i]
             val futureR = buffer[i + 1]
-            val level   = max(abs(futureL.toInt()), abs(futureR.toInt())) / 32768f
+            val level   = max(abs(futureL), abs(futureR))
 
             gainReduction = if (level > thr) {
                 val target = thr / level
@@ -61,13 +60,9 @@ class Limiter(
                 min(1f, gainReduction + release * (1f - gainReduction))
             }
 
-            // Aplicar gain na amostra atrasada (saída real)
-            val outL = delayBuf[delayPos]
-            val outR = delayBuf[delayPos + 1]
-            buffer[i]     = (outL * gainReduction).toInt().coerceIn(-32768, 32767).toShort()
-            buffer[i + 1] = (outR * gainReduction).toInt().coerceIn(-32768, 32767).toShort()
+            buffer[i]     = delayBuf[delayPos]     * gainReduction
+            buffer[i + 1] = delayBuf[delayPos + 1] * gainReduction
 
-            // Armazenar amostra futura no delay
             delayBuf[delayPos]     = futureL
             delayBuf[delayPos + 1] = futureR
             delayPos = (delayPos + 2) % delayLen

@@ -36,11 +36,11 @@ class NoiseGate {
         gain            = 1f
     }
 
-    fun processBuffer(buffer: ShortArray, size: Int) {
+    fun processBuffer(buffer: FloatArray, size: Int) {
         if (!enabled) return
         var i = 0
         while (i < size - 1) {
-            val level = max(abs(buffer[i].toInt()), abs(buffer[i + 1].toInt())) / 32768f
+            val level = max(abs(buffer[i]), abs(buffer[i + 1]))
             val target = if (level > thresholdLinear) {
                 holdRemaining = holdTotal
                 1f
@@ -52,8 +52,8 @@ class NoiseGate {
             }
             val coeff = if (target >= gain) attackCoeff else releaseCoeff
             gain = coeff * gain + (1f - coeff) * target
-            buffer[i]     = (buffer[i].toInt()     * gain).toInt().coerceIn(-32768, 32767).toShort()
-            buffer[i + 1] = (buffer[i + 1].toInt() * gain).toInt().coerceIn(-32768, 32767).toShort()
+            buffer[i]     *= gain
+            buffer[i + 1] *= gain
             i += 2
         }
     }

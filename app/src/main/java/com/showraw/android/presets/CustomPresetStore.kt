@@ -65,6 +65,7 @@ object CustomPresetStore {
         put("compressorAttack",     compressorAttack)
         put("compressorRelease",    compressorRelease)
         put("compressorMakeupDb",   compressorMakeupDb)
+        put("compressorEnabled",    compressorEnabled)
         put("maxDurationMinutes",   maxDurationMinutes)
     }
 
@@ -103,6 +104,7 @@ object CustomPresetStore {
             compressorAttack    = getDouble("compressorAttack").toFloat(),
             compressorRelease   = getDouble("compressorRelease").toFloat(),
             compressorMakeupDb  = getDouble("compressorMakeupDb").toFloat(),
+            compressorEnabled   = optBoolean("compressorEnabled", true),
             maxDurationMinutes  = getInt("maxDurationMinutes"),
         )
     }

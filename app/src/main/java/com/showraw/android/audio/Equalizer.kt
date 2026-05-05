@@ -24,18 +24,18 @@ class Equalizer {
         statesR = bands.map { FloatArray(4) }
     }
 
-    fun processBuffer(buffer: ShortArray, size: Int) {
+    fun processBuffer(buffer: FloatArray, size: Int) {
         if (!enabled || coeffs.isEmpty()) return
         var i = 0
         while (i < size - 1) {
-            var xL = buffer[i].toFloat()     / 32768f
-            var xR = buffer[i + 1].toFloat() / 32768f
+            var xL = buffer[i]
+            var xR = buffer[i + 1]
             for (k in coeffs.indices) {
                 xL = biquad(xL, coeffs[k], statesL[k])
                 xR = biquad(xR, coeffs[k], statesR[k])
             }
-            buffer[i]     = (xL * 32768f).toInt().coerceIn(-32768, 32767).toShort()
-            buffer[i + 1] = (xR * 32768f).toInt().coerceIn(-32768, 32767).toShort()
+            buffer[i]     = xL
+            buffer[i + 1] = xR
             i += 2
         }
     }

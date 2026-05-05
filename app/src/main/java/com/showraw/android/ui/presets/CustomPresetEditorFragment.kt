@@ -110,6 +110,7 @@ class CustomPresetEditorFragment : Fragment() {
         val gateEnabled = p.noiseGateThreshold > -59f
         binding.swNoiseGate.isChecked     = gateEnabled
         binding.sbNgThreshold.progress    = (-p.noiseGateThreshold - 21).toInt().coerceIn(0, 39)
+        binding.swCompEnabled.isChecked   = p.compressorEnabled
         binding.swStabilization.isChecked = p.stabilization
         when (p.videoResolution) {
             Resolution.R4K_30    -> binding.rgResolution.check(binding.rbRes4k30.id)
@@ -275,6 +276,7 @@ class CustomPresetEditorFragment : Fragment() {
             compressorAttack    = (binding.sbCompAttack.progress + 1).toFloat(),
             compressorRelease   = (binding.sbCompRelease.progress + 50).toFloat(),
             compressorMakeupDb  = binding.sbCompMakeup.progress.toFloat(),
+            compressorEnabled   = binding.swCompEnabled.isChecked,
             maxDurationMinutes  = 0,
         )
     }

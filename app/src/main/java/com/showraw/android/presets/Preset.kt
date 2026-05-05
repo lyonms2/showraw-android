@@ -33,6 +33,8 @@ data class Preset(
     val compressorAttack: Float    = 20f,   // ms
     val compressorRelease: Float   = 150f,  // ms
     val compressorMakeupDb: Float  = 6f,    // dB de makeup gain
+    // Compressor bypass
+    val compressorEnabled: Boolean = true,
     // Gravação
     val maxDurationMinutes: Int    = 0,     // 0 = ilimitado
 )

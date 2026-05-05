@@ -27,11 +27,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="20dp"
-            android:text="Configure os parâmetros e salve como preset reutilizável."
+            android:text="Os parâmetros são aplicados na ordem em que aparecem nesta tela."
             android:textColor="#999999"
             android:textSize="12sp" />
 
-        <!-- ── IDENTIDADE ─────────────────────────────────── -->
+        <!-- ── IDENTIDADE ─────────────────────────────────────────── -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -74,28 +74,19 @@
                 android:inputType="text"
                 android:maxLines="1"
                 android:imeOptions="actionNext" />
-
         </LinearLayout>
 
-        <!-- Divider -->
         <View android:layout_width="match_parent" android:layout_height="1dp"
             android:background="#2A2A2A" android:layout_marginBottom="20dp" />
 
-        <!-- ── GANHO DE ENTRADA ───────────────────────────── -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="GANHO DE ENTRADA"
-            android:textColor="#999999"
-            android:textSize="11sp"
-            android:letterSpacing="0.12"
-            android:layout_marginBottom="14dp" />
+        <!-- ── 1. GANHO DE ENTRADA ────────────────────────────────── -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="1 · GANHO DE ENTRADA"
+            android:textColor="#999999" android:textSize="11sp"
+            android:letterSpacing="0.12" android:layout_marginBottom="14dp" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
             <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                 android:layout_weight="1" android:text="Pre-amplificação"
                 android:textColor="@color/white" android:textSize="13sp" />
@@ -106,172 +97,22 @@
         </LinearLayout>
         <SeekBar android:id="@+id/sb_gain"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:layout_marginBottom="4dp"
+            android:layout_marginTop="4dp" android:layout_marginBottom="6dp"
             android:max="30" android:progress="6"
             android:progressTint="@color/primary" android:thumbTint="@color/primary" />
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
-            android:text="0 a +30 dB. Compensa a ausência de AGC ao usar UNPROCESSED. O limiter protege contra saturação."
+            android:text="Amplificação digital aplicada antes de toda a cadeia. Use para compensar microfones com nível analógico baixo ao gravar sem AGC. O limiter no final protege contra saturação."
             android:textColor="#666666" android:textSize="11sp" android:lineSpacingMultiplier="1.3" />
 
-        <!-- Divider -->
         <View android:layout_width="match_parent" android:layout_height="1dp"
             android:background="#2A2A2A" android:layout_marginBottom="20dp" />
 
-        <!-- ── LIMITER ─────────────────────────────────────── -->
+        <!-- ── 2. FILTRO HIGH-PASS ────────────────────────────────── -->
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="LIMITER" android:textColor="#999999"
-            android:textSize="11sp" android:letterSpacing="0.12" android:layout_marginBottom="14dp" />
-
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical">
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="Threshold"
-                android:textColor="@color/white" android:textSize="13sp" />
-            <TextView android:id="@+id/tv_threshold_val"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="-6 dBFS" android:textColor="@color/primary"
-                android:textSize="13sp" android:fontFamily="monospace" />
-        </LinearLayout>
-        <SeekBar android:id="@+id/sb_threshold"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:layout_marginBottom="16dp"
-            android:max="19" android:progressTint="@color/primary" android:thumbTint="@color/primary" />
-
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical">
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="Attack"
-                android:textColor="@color/white" android:textSize="13sp" />
-            <TextView android:id="@+id/tv_attack_val"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="5 ms" android:textColor="@color/primary"
-                android:textSize="13sp" android:fontFamily="monospace" />
-        </LinearLayout>
-        <SeekBar android:id="@+id/sb_attack"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:layout_marginBottom="16dp"
-            android:max="49" android:progressTint="@color/primary" android:thumbTint="@color/primary" />
-
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical">
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="Release"
-                android:textColor="@color/white" android:textSize="13sp" />
-            <TextView android:id="@+id/tv_release_val"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="80 ms" android:textColor="@color/primary"
-                android:textSize="13sp" android:fontFamily="monospace" />
-        </LinearLayout>
-        <SeekBar android:id="@+id/sb_release"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:layout_marginBottom="20dp"
-            android:max="480" android:progressTint="@color/primary" android:thumbTint="@color/primary" />
-
-        <!-- Divider -->
-        <View android:layout_width="match_parent" android:layout_height="1dp"
-            android:background="#2A2A2A" android:layout_marginBottom="20dp" />
-
-        <!-- ── COMPRESSOR ──────────────────────────────────── -->
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="COMPRESSOR" android:textColor="#999999"
-            android:textSize="11sp" android:letterSpacing="0.12" android:layout_marginBottom="14dp" />
-
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical">
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="Threshold"
-                android:textColor="@color/white" android:textSize="13sp" />
-            <TextView android:id="@+id/tv_comp_threshold_val"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="-18 dBFS" android:textColor="@color/primary"
-                android:textSize="13sp" android:fontFamily="monospace" />
-        </LinearLayout>
-        <SeekBar android:id="@+id/sb_comp_threshold"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:layout_marginBottom="14dp"
-            android:max="34" android:progressTint="@color/primary" android:thumbTint="@color/primary" />
-
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical">
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="Ratio"
-                android:textColor="@color/white" android:textSize="13sp" />
-            <TextView android:id="@+id/tv_comp_ratio_val"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="3:1" android:textColor="@color/primary"
-                android:textSize="13sp" android:fontFamily="monospace" />
-        </LinearLayout>
-        <SeekBar android:id="@+id/sb_comp_ratio"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:layout_marginBottom="14dp"
-            android:max="7" android:progress="1"
-            android:progressTint="@color/primary" android:thumbTint="@color/primary" />
-
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical">
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="Makeup Gain"
-                android:textColor="@color/white" android:textSize="13sp" />
-            <TextView android:id="@+id/tv_comp_makeup_val"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="+6 dB" android:textColor="@color/primary"
-                android:textSize="13sp" android:fontFamily="monospace" />
-        </LinearLayout>
-        <SeekBar android:id="@+id/sb_comp_makeup"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:layout_marginBottom="4dp"
-            android:max="18" android:progress="6"
-            android:progressTint="@color/primary" android:thumbTint="@color/primary" />
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginBottom="14dp"
-            android:text="Ratio 2:1 suave, 4:1 moderado, 8:1 agressivo. Makeup compensa a redução de nível."
-            android:textColor="#666666" android:textSize="11sp" android:lineSpacingMultiplier="1.3" />
-
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical">
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="Attack"
-                android:textColor="@color/white" android:textSize="13sp" />
-            <TextView android:id="@+id/tv_comp_attack_val"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="20 ms" android:textColor="@color/primary"
-                android:textSize="13sp" android:fontFamily="monospace" />
-        </LinearLayout>
-        <SeekBar android:id="@+id/sb_comp_attack"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:layout_marginBottom="14dp"
-            android:max="199" android:progress="19"
-            android:progressTint="@color/primary" android:thumbTint="@color/primary" />
-
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical">
-            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="Release"
-                android:textColor="@color/white" android:textSize="13sp" />
-            <TextView android:id="@+id/tv_comp_release_val"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="150 ms" android:textColor="@color/primary"
-                android:textSize="13sp" android:fontFamily="monospace" />
-        </LinearLayout>
-        <SeekBar android:id="@+id/sb_comp_release"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:layout_marginBottom="4dp"
-            android:max="450" android:progress="100"
-            android:progressTint="@color/primary" android:thumbTint="@color/primary" />
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:text="Attack rápido reage na transiente · Release lento soa mais natural e transparente."
-            android:textColor="#666666" android:textSize="11sp" android:lineSpacingMultiplier="1.3" />
-
-        <!-- Divider -->
-        <View android:layout_width="match_parent" android:layout_height="1dp"
-            android:background="#2A2A2A" android:layout_marginBottom="20dp" />
-
-        <!-- ── FILTRO HIGH-PASS ────────────────────────────── -->
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="FILTRO HIGH-PASS" android:textColor="#999999"
-            android:textSize="11sp" android:letterSpacing="0.12" android:layout_marginBottom="14dp" />
+            android:text="2 · FILTRO HIGH-PASS"
+            android:textColor="#999999" android:textSize="11sp"
+            android:letterSpacing="0.12" android:layout_marginBottom="14dp" />
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:gravity="center_vertical">
@@ -293,7 +134,7 @@
             android:textSize="13sp" android:layout_marginBottom="8dp" />
         <RadioGroup android:id="@+id/rg_rolloff"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:layout_marginBottom="20dp">
+            android:orientation="horizontal" android:layout_marginBottom="6dp">
             <RadioButton android:id="@+id/rb_rolloff_12"
                 android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
                 android:text="12 dB/oct" android:textColor="@color/white" android:textSize="12sp"
@@ -308,24 +149,66 @@
                 android:text="24 dB/oct" android:textColor="@color/white" android:textSize="12sp"
                 android:buttonTint="@color/primary" />
         </RadioGroup>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="Corta frequências abaixo do ponto — elimina ruído de estrutura, vibração de mão e vento. 80 Hz preserva grave e kick. 150 Hz remove quase todo vento. 12 dB/oct suave; 24 dB/oct agressivo, mais rejeição mas introduz mais deslocamento de fase."
+            android:textColor="#666666" android:textSize="11sp" android:lineSpacingMultiplier="1.3" />
 
-        <!-- Divider -->
         <View android:layout_width="match_parent" android:layout_height="1dp"
             android:background="#2A2A2A" android:layout_marginBottom="20dp" />
 
-        <!-- ── EQUALIZADOR PARAMÉTRICO ───────────────────── -->
+        <!-- ── 3. NOISE GATE ──────────────────────────────────────── -->
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="EQUALIZADOR PARAMÉTRICO" android:textColor="#999999"
-            android:textSize="11sp" android:letterSpacing="0.12" android:layout_marginBottom="12dp" />
+            android:text="3 · NOISE GATE"
+            android:textColor="#999999" android:textSize="11sp"
+            android:letterSpacing="0.12" android:layout_marginBottom="14dp" />
 
-        <!-- Curva de resposta em frequência -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Ativar Noise Gate"
+                android:textColor="@color/white" android:textSize="13sp" />
+            <Switch android:id="@+id/sw_noise_gate"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:thumbTint="@color/primary" android:trackTint="#333333" />
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Threshold"
+                android:textColor="@color/white" android:textSize="13sp" />
+            <TextView android:id="@+id/tv_ng_threshold_val"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="-40 dBFS" android:textColor="@color/primary"
+                android:textSize="13sp" android:fontFamily="monospace" />
+        </LinearLayout>
+        <SeekBar android:id="@+id/sb_ng_threshold"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:layout_marginBottom="6dp"
+            android:max="39" android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="Silencia o áudio abaixo do threshold — remove ruído ambiente entre sons. Aplicado após o HPF, antes do EQ, para que o gate reaja ao sinal bruto, não ao sinal equalizado. Threshold muito alto pode cortar o início de notas suaves."
+            android:textColor="#666666" android:textSize="11sp" android:lineSpacingMultiplier="1.3" />
+
+        <View android:layout_width="match_parent" android:layout_height="1dp"
+            android:background="#2A2A2A" android:layout_marginBottom="20dp" />
+
+        <!-- ── 4. EQUALIZADOR PARAMÉTRICO ────────────────────────── -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="4 · EQUALIZADOR PARAMÉTRICO"
+            android:textColor="#999999" android:textSize="11sp"
+            android:letterSpacing="0.12" android:layout_marginBottom="12dp" />
+
         <com.showraw.android.ui.views.EqCurveView
             android:id="@+id/eq_curve_view"
             android:layout_width="match_parent"
             android:layout_height="180dp"
             android:layout_marginBottom="16dp" />
 
-        <!-- Band 1: Low Shelf -->
+        <!-- Banda 1: Low Shelf -->
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
             android:text="BANDA 1 — LOW SHELF" android:textColor="#666666"
             android:textSize="10sp" android:letterSpacing="0.1" android:layout_marginBottom="8dp" />
@@ -362,7 +245,7 @@
             android:max="24" android:progress="12"
             android:progressTint="@color/primary" android:thumbTint="@color/primary" />
 
-        <!-- Band 2: Peaking (Mid 1) -->
+        <!-- Banda 2: Peaking Mid 1 -->
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
             android:text="BANDA 2 — PEAKING (MID 1)" android:textColor="#666666"
             android:textSize="10sp" android:letterSpacing="0.1" android:layout_marginBottom="8dp" />
@@ -411,15 +294,11 @@
         </LinearLayout>
         <SeekBar android:id="@+id/sb_eq_mid_q"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:layout_marginBottom="4dp"
+            android:layout_marginTop="4dp" android:layout_marginBottom="16dp"
             android:max="27" android:progress="4"
             android:progressTint="@color/primary" android:thumbTint="@color/primary" />
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="Q baixo (0.3) = banda larga e suave  ·  Q alto (3.0) = banda estreita e cirúrgica"
-            android:textColor="#555555" android:textSize="11sp" />
 
-        <!-- Band 3: Peaking (Mid 2) -->
+        <!-- Banda 3: Peaking Mid 2 -->
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
             android:text="BANDA 3 — PEAKING (MID 2)" android:textColor="#666666"
             android:textSize="10sp" android:letterSpacing="0.1" android:layout_marginBottom="8dp" />
@@ -472,7 +351,7 @@
             android:max="27" android:progress="4"
             android:progressTint="@color/primary" android:thumbTint="@color/primary" />
 
-        <!-- Band 4: High Shelf -->
+        <!-- Banda 4: High Shelf -->
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
             android:text="BANDA 4 — HIGH SHELF" android:textColor="#666666"
             android:textSize="10sp" android:letterSpacing="0.1" android:layout_marginBottom="8dp" />
@@ -505,26 +384,32 @@
         </LinearLayout>
         <SeekBar android:id="@+id/sb_eq_high_gain"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:layout_marginBottom="20dp"
+            android:layout_marginTop="4dp" android:layout_marginBottom="6dp"
             android:max="24" android:progress="12"
             android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="Low Shelf: boost/corte em tudo abaixo da frequência. Peaking: sino centrado — Q 0.3 largo e musical, Q 3.0 cirúrgico para problemas pontuais. High Shelf: boost/corte em tudo acima da frequência. Ganho 0 dB em todas as bandas = EQ bypass (processamento pulado)."
+            android:textColor="#666666" android:textSize="11sp" android:lineSpacingMultiplier="1.3" />
 
-        <!-- Divider -->
         <View android:layout_width="match_parent" android:layout_height="1dp"
             android:background="#2A2A2A" android:layout_marginBottom="20dp" />
 
-        <!-- ── NOISE GATE ──────────────────────────────────── -->
+        <!-- ── 5. COMPRESSOR ──────────────────────────────────────── -->
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="NOISE GATE" android:textColor="#999999"
-            android:textSize="11sp" android:letterSpacing="0.12" android:layout_marginBottom="14dp" />
+            android:text="5 · COMPRESSOR"
+            android:textColor="#999999" android:textSize="11sp"
+            android:letterSpacing="0.12" android:layout_marginBottom="14dp" />
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="12dp">
+            android:orientation="horizontal" android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
             <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:text="Ativar Noise Gate"
+                android:layout_weight="1" android:text="Ativar Compressor"
                 android:textColor="@color/white" android:textSize="13sp" />
-            <Switch android:id="@+id/sw_noise_gate"
+            <Switch android:id="@+id/sw_comp_enabled"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:checked="true"
                 android:thumbTint="@color/primary" android:trackTint="#333333" />
         </LinearLayout>
 
@@ -533,27 +418,154 @@
             <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                 android:layout_weight="1" android:text="Threshold"
                 android:textColor="@color/white" android:textSize="13sp" />
-            <TextView android:id="@+id/tv_ng_threshold_val"
+            <TextView android:id="@+id/tv_comp_threshold_val"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="-40 dBFS" android:textColor="@color/primary"
+                android:text="-18 dBFS" android:textColor="@color/primary"
                 android:textSize="13sp" android:fontFamily="monospace" />
         </LinearLayout>
-        <SeekBar android:id="@+id/sb_ng_threshold"
+        <SeekBar android:id="@+id/sb_comp_threshold"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:layout_marginBottom="20dp"
-            android:max="39" android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+            android:layout_marginTop="4dp" android:layout_marginBottom="14dp"
+            android:max="34" android:progressTint="@color/primary" android:thumbTint="@color/primary" />
 
-        <!-- Divider -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Ratio"
+                android:textColor="@color/white" android:textSize="13sp" />
+            <TextView android:id="@+id/tv_comp_ratio_val"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="3:1" android:textColor="@color/primary"
+                android:textSize="13sp" android:fontFamily="monospace" />
+        </LinearLayout>
+        <SeekBar android:id="@+id/sb_comp_ratio"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:layout_marginBottom="14dp"
+            android:max="7" android:progress="1"
+            android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Makeup Gain"
+                android:textColor="@color/white" android:textSize="13sp" />
+            <TextView android:id="@+id/tv_comp_makeup_val"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="+6 dB" android:textColor="@color/primary"
+                android:textSize="13sp" android:fontFamily="monospace" />
+        </LinearLayout>
+        <SeekBar android:id="@+id/sb_comp_makeup"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:layout_marginBottom="14dp"
+            android:max="18" android:progress="6"
+            android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Attack"
+                android:textColor="@color/white" android:textSize="13sp" />
+            <TextView android:id="@+id/tv_comp_attack_val"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="20 ms" android:textColor="@color/primary"
+                android:textSize="13sp" android:fontFamily="monospace" />
+        </LinearLayout>
+        <SeekBar android:id="@+id/sb_comp_attack"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:layout_marginBottom="14dp"
+            android:max="199" android:progress="19"
+            android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Release"
+                android:textColor="@color/white" android:textSize="13sp" />
+            <TextView android:id="@+id/tv_comp_release_val"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="150 ms" android:textColor="@color/primary"
+                android:textSize="13sp" android:fontFamily="monospace" />
+        </LinearLayout>
+        <SeekBar android:id="@+id/sb_comp_release"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:layout_marginBottom="6dp"
+            android:max="450" android:progress="100"
+            android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="Reduz o range dinâmico comprimindo picos acima do threshold. Ratio 2:1 sutil, 8:1 agressivo. Attack rápido (&lt;10 ms) reage na transiente; lento deixa o ataque passar para mais punch. Release lento soa mais transparente. Makeup restitui o nível reduzido pela compressão."
+            android:textColor="#666666" android:textSize="11sp" android:lineSpacingMultiplier="1.3" />
+
         <View android:layout_width="match_parent" android:layout_height="1dp"
             android:background="#2A2A2A" android:layout_marginBottom="20dp" />
 
-        <!-- ── CÂMERA ──────────────────────────────────────── -->
+        <!-- ── 6. LIMITER ─────────────────────────────────────────── -->
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="CÂMERA" android:textColor="#999999"
-            android:textSize="11sp" android:letterSpacing="0.12" android:layout_marginBottom="14dp" />
+            android:text="6 · LIMITER"
+            android:textColor="#999999" android:textSize="11sp"
+            android:letterSpacing="0.12" android:layout_marginBottom="14dp" />
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="20dp">
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Threshold"
+                android:textColor="@color/white" android:textSize="13sp" />
+            <TextView android:id="@+id/tv_threshold_val"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="-6 dBFS" android:textColor="@color/primary"
+                android:textSize="13sp" android:fontFamily="monospace" />
+        </LinearLayout>
+        <SeekBar android:id="@+id/sb_threshold"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:layout_marginBottom="14dp"
+            android:max="19" android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Attack"
+                android:textColor="@color/white" android:textSize="13sp" />
+            <TextView android:id="@+id/tv_attack_val"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="5 ms" android:textColor="@color/primary"
+                android:textSize="13sp" android:fontFamily="monospace" />
+        </LinearLayout>
+        <SeekBar android:id="@+id/sb_attack"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:layout_marginBottom="14dp"
+            android:max="49" android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Release"
+                android:textColor="@color/white" android:textSize="13sp" />
+            <TextView android:id="@+id/tv_release_val"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="80 ms" android:textColor="@color/primary"
+                android:textSize="13sp" android:fontFamily="monospace" />
+        </LinearLayout>
+        <SeekBar android:id="@+id/sb_release"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:layout_marginBottom="6dp"
+            android:max="480" android:progressTint="@color/primary" android:thumbTint="@color/primary" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="Teto absoluto — nenhuma amostra ultrapassa o threshold. Usa lookahead de 5 ms embutido para antecipar transientes. Deve ser sempre a última etapa da cadeia. -6 dBFS é um bom ponto de partida para deixar headroom na gravação."
+            android:textColor="#666666" android:textSize="11sp" android:lineSpacingMultiplier="1.3" />
+
+        <View android:layout_width="match_parent" android:layout_height="1dp"
+            android:background="#2A2A2A" android:layout_marginBottom="20dp" />
+
+        <!-- ── 7. CÂMERA ──────────────────────────────────────────── -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="7 · CÂMERA"
+            android:textColor="#999999" android:textSize="11sp"
+            android:letterSpacing="0.12" android:layout_marginBottom="14dp" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical"
+            android:layout_marginBottom="20dp">
             <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                 android:layout_weight="1" android:text="Estabilização (EIS)"
                 android:textColor="@color/white" android:textSize="13sp" />
@@ -562,14 +574,14 @@
                 android:thumbTint="@color/primary" android:trackTint="#333333" />
         </LinearLayout>
 
-        <!-- Divider -->
         <View android:layout_width="match_parent" android:layout_height="1dp"
             android:background="#2A2A2A" android:layout_marginBottom="20dp" />
 
-        <!-- ── VÍDEO ───────────────────────────────────────── -->
+        <!-- ── 8. VÍDEO ───────────────────────────────────────────── -->
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="VÍDEO" android:textColor="#999999"
-            android:textSize="11sp" android:letterSpacing="0.12" android:layout_marginBottom="14dp" />
+            android:text="8 · VÍDEO"
+            android:textColor="#999999" android:textSize="11sp"
+            android:letterSpacing="0.12" android:layout_marginBottom="14dp" />
 
         <RadioGroup android:id="@+id/rg_resolution"
             android:layout_width="match_parent" android:layout_height="wrap_content"
