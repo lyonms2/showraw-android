@@ -110,6 +110,34 @@ class VideoCaptureManager(private val context: Context) {
         )
     }
 
+    @androidx.annotation.OptIn(ExperimentalCamera2Interop::class)
+    fun setShutterMode(mode: ShutterMode, iso: Int = 400) {
+        val cam = camera ?: return
+        val builder = CaptureRequestOptions.Builder()
+        if (mode == ShutterMode.AUTO) {
+            builder.setCaptureRequestOption(
+                CaptureRequest.CONTROL_AE_MODE,
+                CaptureRequest.CONTROL_AE_MODE_ON,
+            )
+        } else {
+            builder
+                .setCaptureRequestOption(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_OFF)
+                .setCaptureRequestOption(CaptureRequest.SENSOR_EXPOSURE_TIME, mode.exposureNs)
+                .setCaptureRequestOption(CaptureRequest.SENSOR_SENSITIVITY, iso)
+        }
+        Camera2CameraControl.from(cam.cameraControl).addCaptureRequestOptions(builder.build())
+    }
+
+    @androidx.annotation.OptIn(ExperimentalCamera2Interop::class)
+    fun setIso(iso: Int) {
+        val cam = camera ?: return
+        Camera2CameraControl.from(cam.cameraControl).addCaptureRequestOptions(
+            CaptureRequestOptions.Builder()
+                .setCaptureRequestOption(CaptureRequest.SENSOR_SENSITIVITY, iso)
+                .build()
+        )
+    }
+
     fun flipCamera(
         lifecycleOwner: LifecycleOwner,
         previewView: PreviewView,

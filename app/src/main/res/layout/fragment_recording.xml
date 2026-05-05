@@ -215,7 +215,7 @@
 
     </LinearLayout>
 
-    <!-- Zoom level badge — center top, hidden until zoomed -->
+    <!-- Zoom level badge — center, below vu_bar, hidden until zoomed -->
     <TextView
         android:id="@+id/tv_zoom_level"
         android:layout_width="wrap_content"
@@ -233,7 +233,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Session name input — visível no estado de preview, some ao gravar -->
+    <!-- Session name input — visível no preview, some ao gravar -->
     <EditText
         android:id="@+id/et_session_name"
         android:layout_width="0dp"
@@ -254,72 +254,37 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Exposure control row — visível durante gravação -->
-    <LinearLayout
-        android:id="@+id/exposure_row"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
+    <!-- Focus indicator ring — posicionado via translationX/Y no tap -->
+    <View
+        android:id="@+id/focus_ring"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/focus_ring"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/et_session_name"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="☀"
-            android:textColor="#999999"
-            android:textSize="14sp"
-            android:layout_marginEnd="8dp" />
-
-        <SeekBar
-            android:id="@+id/sb_exposure"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:max="100"
-            android:progress="50"
-            android:progressTint="@color/primary"
-            android:thumbTint="@color/primary" />
-
-        <TextView
-            android:id="@+id/tv_exposure_val"
-            android:layout_width="44dp"
-            android:layout_height="wrap_content"
-            android:text="0"
-            android:textColor="@color/primary"
-            android:textSize="12sp"
-            android:fontFamily="monospace"
-            android:gravity="end"
-            android:layout_marginStart="8dp" />
-    </LinearLayout>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <!-- Bottom gradient overlay -->
     <View
         android:layout_width="0dp"
-        android:layout_height="220dp"
-        android:background="#CC0D0D0D"
+        android:layout_height="360dp"
+        android:background="@drawable/gradient_bottom"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Waveform view — acima da row de stats -->
+    <!-- Waveform — acima da row de stats -->
     <com.showraw.android.ui.recording.WaveformView
         android:id="@+id/waveform_view"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:layout_marginHorizontal="0dp"
         android:layout_marginBottom="4dp"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/stats_row"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Stats row: PEAK / LIMITER GR / PRESET -->
+    <!-- Stats row: PEAK · COMP GR · LIM GR -->
     <LinearLayout
         android:id="@+id/stats_row"
         android:layout_width="0dp"
@@ -327,7 +292,7 @@
         android:layout_marginHorizontal="24dp"
         android:layout_marginBottom="8dp"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@id/btn_row"
+        app:layout_constraintBottom_toTopOf="@id/control_panel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -336,7 +301,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical">
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -344,7 +308,6 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="10sp"
                 android:letterSpacing="0.1" />
-
             <TextView
                 android:id="@+id/tv_peak"
                 android:layout_width="wrap_content"
@@ -361,7 +324,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical">
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -369,7 +331,6 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="10sp"
                 android:letterSpacing="0.1" />
-
             <TextView
                 android:id="@+id/tv_comp_gr"
                 android:layout_width="wrap_content"
@@ -386,7 +347,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical">
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -394,7 +354,6 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="10sp"
                 android:letterSpacing="0.1" />
-
             <TextView
                 android:id="@+id/tv_gr"
                 android:layout_width="wrap_content"
@@ -408,7 +367,172 @@
 
     </LinearLayout>
 
-    <!-- Buttons: Pausar (disabled) + Parar -->
+    <!-- Control panel: EV/ISO · Shutter · Zoom — sempre visível -->
+    <LinearLayout
+        android:id="@+id/control_panel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@id/btn_row"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Linha EV / ISO -->
+        <LinearLayout
+            android:id="@+id/exposure_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="5dp">
+
+            <TextView
+                android:id="@+id/tv_exposure_label"
+                android:layout_width="28dp"
+                android:layout_height="wrap_content"
+                android:text="EV"
+                android:textColor="#999999"
+                android:textSize="10sp"
+                android:letterSpacing="0.05" />
+
+            <SeekBar
+                android:id="@+id/sb_exposure"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:max="100"
+                android:progress="50"
+                android:progressTint="@color/primary"
+                android:thumbTint="@color/primary" />
+
+            <TextView
+                android:id="@+id/tv_exposure_val"
+                android:layout_width="56dp"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@color/primary"
+                android:textSize="11sp"
+                android:fontFamily="monospace"
+                android:gravity="end"
+                android:layout_marginStart="6dp" />
+        </LinearLayout>
+
+        <!-- Linha shutter speed -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp">
+
+            <Button
+                android:id="@+id/btn_shutter_auto"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="3dp"
+                android:backgroundTint="@color/primary"
+                android:text="Auto"
+                android:textColor="@color/bg_main"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:padding="0dp" />
+
+            <Button
+                android:id="@+id/btn_shutter_50"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="3dp"
+                android:backgroundTint="#80000000"
+                android:text="1/50"
+                android:textColor="@color/white"
+                android:textSize="9sp"
+                android:padding="0dp" />
+
+            <Button
+                android:id="@+id/btn_shutter_60"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="3dp"
+                android:backgroundTint="#80000000"
+                android:text="1/60"
+                android:textColor="@color/white"
+                android:textSize="9sp"
+                android:padding="0dp" />
+
+            <Button
+                android:id="@+id/btn_shutter_100"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="3dp"
+                android:backgroundTint="#80000000"
+                android:text="1/100"
+                android:textColor="@color/white"
+                android:textSize="9sp"
+                android:padding="0dp" />
+
+            <Button
+                android:id="@+id/btn_shutter_120"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="1"
+                android:backgroundTint="#80000000"
+                android:text="1/120"
+                android:textColor="@color/white"
+                android:textSize="9sp"
+                android:padding="0dp" />
+        </LinearLayout>
+
+        <!-- Linha zoom shortcuts -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_zoom_05"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:backgroundTint="#80000000"
+                android:text="0.5×"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:padding="0dp" />
+
+            <Button
+                android:id="@+id/btn_zoom_1"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:backgroundTint="@color/primary"
+                android:text="1×"
+                android:textColor="@color/bg_main"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:padding="0dp" />
+
+            <Button
+                android:id="@+id/btn_zoom_2"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="1"
+                android:backgroundTint="#80000000"
+                android:text="2×"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:padding="0dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Buttons: Pausar + Gravar/Parar -->
     <LinearLayout
         android:id="@+id/btn_row"
         android:layout_width="0dp"
@@ -438,7 +562,7 @@
             android:layout_height="match_parent"
             android:layout_weight="2"
             android:backgroundTint="@color/primary"
-            android:text="■ Parar"
+            android:text="● Gravar"
             android:textColor="@color/bg_main"
             android:textSize="15sp"
             android:textStyle="bold"
@@ -474,7 +598,6 @@
             android:textSize="14sp" />
 
     </LinearLayout>
-
 
     <!-- SPL extreme warning overlay -->
     <LinearLayout
