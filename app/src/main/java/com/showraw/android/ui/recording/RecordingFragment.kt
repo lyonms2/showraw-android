@@ -452,6 +452,20 @@ class RecordingFragment : Fragment() {
                 .setInterpolator(android.view.animation.DecelerateInterpolator())
                 .start()
         }
+        // Compact labels when rotated sideways to prevent text clipping
+        val compact = degrees == 90f || degrees == -90f
+        _binding?.btnStop?.text = when {
+            compact && isRecording -> "■"
+            compact                -> "●"
+            isRecording            -> "■ Parar"
+            else                   -> "● Gravar"
+        }
+        _binding?.btnPause?.text = when {
+            compact && isPaused -> "▶"
+            compact             -> "⏸"
+            isPaused            -> "▶ Retomar"
+            else                -> "⏸ Pausar"
+        }
     }
 
     private fun toggleMonitoring() {

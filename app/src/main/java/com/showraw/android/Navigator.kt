@@ -7,4 +7,5 @@ interface Navigator {
     fun showProSettings()
     fun showLibrary()
     fun showManual()
+    fun showCustomPresetEditor(presetId: String? = null)
 }

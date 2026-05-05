@@ -64,8 +64,28 @@ class ManualFragment : Fragment() {
 • Vlog — som natural com correção suave.
 • Reunião — noise gate forte, ganho conservador.
 • Modo Pro — você configura cada parâmetro manualmente em Ajustes Avançados.
+• Presets Personalizados — crie seus próprios perfis de DSP (veja Modo Pro).
 
 O nome e o emoji do preset ativo aparecem no canto inferior direito da tela de gravação.""")
+
+        addSection(root, "🎙 Microfone Externo",
+            """O ShowRaw captura áudio em modo UNPROCESSED — sem processamento automático do Android — para máxima qualidade. Isso também significa que o Controle de Ganho Automático (AGC) do sistema está desativado.
+
+LIMITAÇÕES POR TIPO DE DISPOSITIVO
+──────────────────────────────────
+▸ Celular sem microfone externo
+  O microfone embutido está posicionado para capturar voz próxima, não fontes distantes. Em shows e ambientes com volume alto o sinal pode saturar ou soar com artefatos mesmo com o melhor preset.
+
+▸ Microfone de lapela (P2 / TRRS)
+  Melhora muito a captação de voz em entrevistas e vlogs. Resultado depende da qualidade do microfone e do conector TRRS do aparelho.
+
+▸ Microfone externo via adaptador USB-C
+  Solução recomendada para gravações profissionais. Permite posicionar o microfone próximo à fonte sonora, eliminando boa parte dos problemas de nível e ruído de fundo.
+
+▸ Interface de áudio USB-C
+  Nível profissional. Permite ligar qualquer microfone XLR com phantom power e controle de ganho analógico preciso.
+
+ATENÇÃO: Nenhum processamento de software substitui um bom posicionamento de microfone. O app faz o melhor possível com o hardware disponível, mas o resultado final é limitado pelo microfone utilizado.""")
 
         addSection(root, "🔒 Limiter",
             """O Limiter é uma proteção automática que impede o clipping (distorção por saturação).
@@ -102,6 +122,24 @@ Bandas:
 
 Dica: comece com todos em 0 dB e ajuste aos poucos. Cortar é geralmente mais eficaz que aumentar.""")
 
+        addSection(root, "🎚 Compressor",
+            """O Compressor reduz dinamicamente o volume dos sons mais altos, nivelando a gravação.
+
+Como funciona:
+  Threshold: nível a partir do qual o compressor começa a agir (ex.: −18 dBFS).
+  Ratio: quanto o sinal é comprimido. Ex.: 3:1 = cada 3 dB acima do threshold vira 1 dB.
+  Makeup Gain: compensação de nível aplicada após a compressão para restaurar o volume.
+  Attack: tempo para o compressor reagir a um pico (mais curto = mais agressivo).
+  Release: tempo para soltar após o pico cair.
+
+O compressor é aplicado depois do EQ e antes do Limiter na cadeia de DSP:
+  Ganho → HPF → EQ → Compressor → Limiter
+
+Por que isso importa:
+  Em shows com bateria e palco alto, o compressor controla os picos intensos e sobe o volume médio. O Limiter é o último recurso contra clipping — idealmente deve acionar pouco.
+
+Dica: se o indicador GR (Gain Reduction) do Limiter estiver sempre ativo, diminua o Makeup Gain do compressor.""")
+
         addSection(root, "🚪 Noise Gate",
             """O Noise Gate silencia automaticamente o sinal quando ele cai abaixo de um limiar.
 
@@ -125,7 +163,10 @@ Zoom — Pinça dois dedos na pré-visualização para ampliar. O nível aparece
 
 Exposição — Arraste o controle deslizante para ajustar o brilho da imagem em tempo real.
 
-Foco — Toque em qualquer ponto da tela para focar naquele ponto.""")
+Foco — Toque em qualquer ponto da tela para focar naquele ponto.
+
+🎧 Monitoramento de áudio — Aparece durante a gravação. Reproduz o áudio capturado pelo fone de ouvido em tempo real.
+  Atenção: existe uma latência de 50–200 ms dependendo do dispositivo. Use apenas para verificar nível, não para performance ao vivo.""")
 
         addSection(root, "📤 Exportação",
             """Após parar a gravação, o app processa e combina vídeo + áudio:
@@ -142,17 +183,24 @@ Compartilhamento:
 Localização GPS é incorporada nos metadados do MP4 se a permissão for concedida.""")
 
         addSection(root, "⚙ Modo Pro",
-            """O Modo Pro dá controle total sobre todos os parâmetros de DSP.
+            """O Modo Pro oferece duas formas de controle avançado:
 
-Acesso: na tela inicial, selecione o preset "Pro" e toque em Gravar — você será redirecionado para Ajustes Avançados onde pode configurar:
-
+── AJUSTES PRO (preset Manual) ────────────────────
+Acesso: selecione o preset "Manual" e toque em Gravar. Você será redirecionado para Ajustes Avançados onde configura sessão a sessão:
 • Frequência e rolloff do HPF
 • Threshold, attack e release do Limiter
 • Ganhos de graves, médios e agudos do EQ
 • Threshold do Noise Gate
 • Resolução de vídeo e estabilização
 
-As configurações Pro são salvas automaticamente e aplicadas na próxima gravação.""")
+── PRESETS PERSONALIZADOS ──────────────────────────
+Para usuários que usam sempre as mesmas configurações, crie presets reutilizáveis com nome e emoji próprios.
+
+Como criar: na tela de seleção de presets, role até o final e toque no cartão "+ Novo Preset". Configure todos os parâmetros de DSP e câmera e toque em "Salvar Preset".
+
+O preset aparece na grade ao lado dos presets padrão. Para editar ou excluir, pressione e segure o cartão.
+
+Exemplo de uso: um músico de estúdio pode criar "🎸 Ensaio" com compressão moderada e noise gate desativado, e "🎤 Palco" com ganho máximo e HPF agressivo.""")
 
         return scroll
     }

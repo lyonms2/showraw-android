@@ -7,12 +7,14 @@ import android.os.StatFs
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.showraw.android.Navigator
 import com.showraw.android.R
 import com.showraw.android.databinding.FragmentPresetsBinding
+import com.showraw.android.presets.CustomPresetStore
 import com.showraw.android.presets.Preset
 import com.showraw.android.presets.PresetRepository
 
@@ -21,7 +23,7 @@ class PresetsFragment : Fragment() {
     private var _binding: FragmentPresetsBinding? = null
     private val binding get() = _binding!!
 
-    private var selectedPreset: Preset = PresetRepository.all.first()
+    private lateinit var adapter: PresetAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
@@ -33,23 +35,19 @@ class PresetsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = PresetAdapter { preset ->
-            selectedPreset = preset
-            updateSummary(preset)
-        }
+        adapter = PresetAdapter(
+            onSelect = { preset -> updateSummary(preset) },
+            onAdd    = { (requireActivity() as? Navigator)?.showCustomPresetEditor(null) },
+            onLongPress = { preset -> showPresetOptions(preset) },
+        )
         binding.rvPresets.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvPresets.adapter = adapter
 
-        updateSummary(selectedPreset)
-
         binding.btnRecord.setOnClickListener {
-            if (availableMinutes(selectedPreset) < 5) return@setOnClickListener
+            val selected = adapter.getSelectedPreset() ?: return@setOnClickListener
+            if (availableMinutes(selected) < 5) return@setOnClickListener
             val nav = requireActivity() as? Navigator ?: return@setOnClickListener
-            if (selectedPreset.id == "manual") {
-                nav.showProSettings()
-            } else {
-                nav.startRecording(selectedPreset.id)
-            }
+            if (selected.id == "manual") nav.showProSettings() else nav.startRecording(selected.id)
         }
 
         binding.btnLibrary.setOnClickListener {
@@ -59,6 +57,38 @@ class PresetsFragment : Fragment() {
         binding.btnManual.setOnClickListener {
             (requireActivity() as? Navigator)?.showManual()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshPresets()
+    }
+
+    private fun refreshPresets() {
+        adapter.setData(PresetRepository.all, CustomPresetStore.load(requireContext()))
+        val selected = adapter.getSelectedPreset() ?: PresetRepository.all.first()
+        updateSummary(selected)
+    }
+
+    private fun showPresetOptions(preset: Preset) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("${preset.emoji} ${preset.name}")
+            .setItems(arrayOf("✏  Editar", "🗑  Excluir")) { _, which ->
+                when (which) {
+                    0 -> (requireActivity() as? Navigator)?.showCustomPresetEditor(preset.id)
+                    1 -> {
+                        AlertDialog.Builder(requireContext())
+                            .setMessage("Excluir \"${preset.name}\"?")
+                            .setPositiveButton("Excluir") { _, _ ->
+                                CustomPresetStore.delete(requireContext(), preset.id)
+                                refreshPresets()
+                            }
+                            .setNegativeButton("Cancelar", null)
+                            .show()
+                    }
+                }
+            }
+            .show()
     }
 
     private fun updateSummary(preset: Preset) {
@@ -99,15 +129,12 @@ class PresetsFragment : Fragment() {
         }
     }
 
-    private fun availableMinutes(preset: Preset): Long {
-        return getFreeStorageMb() / preset.estimatedMbPerMin
-    }
+    private fun availableMinutes(preset: Preset): Long = getFreeStorageMb() / preset.estimatedMbPerMin
 
     private fun getFreeStorageMb(): Long {
         val path = requireContext().getExternalFilesDir(null)?.absolutePath
             ?: Environment.getExternalStorageDirectory().absolutePath
-        val stat = StatFs(path)
-        return stat.availableBlocksLong * stat.blockSizeLong / (1024L * 1024L)
+        return StatFs(path).let { it.availableBlocksLong * it.blockSizeLong / (1024L * 1024L) }
     }
 
     override fun onDestroyView() {
