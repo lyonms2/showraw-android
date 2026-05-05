@@ -169,7 +169,7 @@ class CustomPresetEditorFragment : Fragment() {
     // ── Helpers ──────────────────────────────────────────────────────
 
     private fun progressToFreq(p: Int, min: Float, max: Float) =
-        min * (max / min).pow(p / 100.0).toFloat()
+        min * (max / min).pow(p / 100f)
 
     private fun freqToProgress(freq: Float, min: Float, max: Float) =
         (log2(freq / min) / log2(max / min) * 100).roundToInt().coerceIn(0, 100)
