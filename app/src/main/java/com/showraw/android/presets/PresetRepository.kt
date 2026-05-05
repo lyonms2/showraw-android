@@ -49,20 +49,6 @@ object PresetRepository {
             compressorAttack = 15f, compressorRelease = 120f, compressorMakeupDb = 6f,
         ),
 
-        Preset(
-            id = "manual", name = "Manual (Pro)", emoji = "🎛️",
-            description = "Controle total sobre todos os parâmetros de áudio e vídeo.",
-            limiterThreshold = -6f, limiterAttack = 5f, limiterRelease = 80f,
-            hpfFrequency = 120f, hpfRolloff = 18,
-            videoResolution = Resolution.R4K_30, estimatedMbPerMin = 350,
-            contextualWarning = null,
-            // DSP — valores neutros, usuário define em Ajustes Avançados
-            inputGainDb = 0f,
-            noiseGateThreshold = -60f,
-            eqLowGainDb = 0f, eqMidGainDb = 0f, eqHighGainDb = 0f,
-            compressorThreshold = -18f, compressorRatio = 3f,
-            compressorAttack = 20f, compressorRelease = 150f, compressorMakeupDb = 6f,
-        ),
     )
 
     fun findById(id: String): Preset? = all.firstOrNull { it.id == id }

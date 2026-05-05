@@ -47,7 +47,7 @@ class PresetsFragment : Fragment() {
             val selected = adapter.getSelectedPreset() ?: return@setOnClickListener
             if (availableMinutes(selected) < 5) return@setOnClickListener
             val nav = requireActivity() as? Navigator ?: return@setOnClickListener
-            if (selected.id == "manual") nav.showProSettings() else nav.startRecording(selected.id)
+            nav.startRecording(selected.id)
         }
 
         binding.btnLibrary.setOnClickListener {
