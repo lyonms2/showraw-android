@@ -67,6 +67,7 @@ object CustomPresetStore {
         put("compressorMakeupDb",   compressorMakeupDb)
         put("compressorEnabled",    compressorEnabled)
         put("maxDurationMinutes",   maxDurationMinutes)
+        put("targetBitrateKbps",    targetBitrateKbps)
     }
 
     private fun EqBand.toJson() = JSONObject().apply {
@@ -106,6 +107,7 @@ object CustomPresetStore {
             compressorMakeupDb  = getDouble("compressorMakeupDb").toFloat(),
             compressorEnabled   = optBoolean("compressorEnabled", true),
             maxDurationMinutes  = getInt("maxDurationMinutes"),
+            targetBitrateKbps   = optInt("targetBitrateKbps", 0),
         )
     }
 

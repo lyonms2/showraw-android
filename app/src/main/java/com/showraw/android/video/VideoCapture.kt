@@ -2,8 +2,11 @@ package com.showraw.android.video
 
 import android.content.Context
 import android.hardware.camera2.CaptureRequest
+import android.util.Range
 import android.view.Surface
+import androidx.camera.camera2.interop.Camera2CameraControl
 import androidx.camera.camera2.interop.Camera2Interop
+import androidx.camera.camera2.interop.CaptureRequestOptions
 import androidx.camera.camera2.interop.ExperimentalCamera2Interop
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraControl
@@ -45,22 +48,34 @@ class VideoCaptureManager(private val context: Context) {
         future.addListener({
             cameraProvider = future.get()
 
-            // Rotação atual do display — necessária para que o MP4 grave com a
-            // orientação correta. Sem isso, o sensor da câmera traseira (90° físico)
-            // grava sempre em paisagem independente de como o celular está segurado.
             val rotation = previewView.display?.rotation ?: Surface.ROTATION_0
 
             val quality = resolveQuality(preset.videoResolution)
-            val recorder = Recorder.Builder()
+            val recorderBuilder = Recorder.Builder()
                 .setQualitySelector(QualitySelector.from(quality, FallbackStrategy.lowerQualityThan(quality)))
-                .build()
-            val vcBuilder = VideoCapture.Builder(recorder).setTargetRotation(rotation)
+            if (preset.targetBitrateKbps > 0) {
+                recorderBuilder.setTargetVideoEncodingBitRate(preset.targetBitrateKbps * 1_000)
+            }
+
+            val vcBuilder = VideoCapture.Builder(recorderBuilder.build()).setTargetRotation(rotation)
+
+            val ext = Camera2Interop.Extender(vcBuilder)
             if (preset.stabilization) {
-                Camera2Interop.Extender(vcBuilder).setCaptureRequestOption(
+                ext.setCaptureRequestOption(
                     CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE,
                     CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_ON,
                 )
             }
+            // Forçar FPS alvo — sem isso R4K_60/R1080P_60 ficam no padrão do dispositivo (geralmente 30)
+            val targetFps = when (preset.videoResolution) {
+                Resolution.R4K_60, Resolution.R1080P_60 -> 60
+                else -> 30
+            }
+            ext.setCaptureRequestOption(
+                CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE,
+                Range(targetFps, targetFps),
+            )
+
             videoCapture = vcBuilder.build()
 
             val preview = Preview.Builder()
@@ -83,6 +98,16 @@ class VideoCaptureManager(private val context: Context) {
                 android.util.Log.e("VideoCaptureManager", "bindToLifecycle falhou", e)
             }
         }, ContextCompat.getMainExecutor(context))
+    }
+
+    @androidx.annotation.OptIn(ExperimentalCamera2Interop::class)
+    fun setWbMode(mode: WbMode) {
+        val cam = camera ?: return
+        Camera2CameraControl.from(cam.cameraControl).addCaptureRequestOptions(
+            CaptureRequestOptions.Builder()
+                .setCaptureRequestOption(CaptureRequest.CONTROL_AWB_MODE, mode.awbMode)
+                .build()
+        )
     }
 
     fun flipCamera(

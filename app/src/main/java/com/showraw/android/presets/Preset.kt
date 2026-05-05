@@ -37,4 +37,6 @@ data class Preset(
     val compressorEnabled: Boolean = true,
     // Gravação
     val maxDurationMinutes: Int    = 0,     // 0 = ilimitado
+    // Bitrate de vídeo (0 = CameraX decide automaticamente com base na qualidade)
+    val targetBitrateKbps: Int     = 0,
 )

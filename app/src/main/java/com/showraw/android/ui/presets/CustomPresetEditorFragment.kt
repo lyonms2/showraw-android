@@ -118,6 +118,12 @@ class CustomPresetEditorFragment : Fragment() {
             Resolution.R1080P_30 -> binding.rgResolution.check(binding.rbRes1080p30.id)
             Resolution.R1080P_60 -> binding.rgResolution.check(binding.rbRes1080p60.id)
         }
+        when (p.targetBitrateKbps) {
+            16_000 -> binding.rgBitrate.check(binding.rbBitrate16m.id)
+            30_000 -> binding.rgBitrate.check(binding.rbBitrate30m.id)
+            50_000 -> binding.rgBitrate.check(binding.rbBitrate50m.id)
+            else   -> binding.rgBitrate.check(binding.rbBitrateAuto.id)
+        }
         updateAllLabels()
         refreshCurve()
     }
@@ -278,6 +284,12 @@ class CustomPresetEditorFragment : Fragment() {
             compressorMakeupDb  = binding.sbCompMakeup.progress.toFloat(),
             compressorEnabled   = binding.swCompEnabled.isChecked,
             maxDurationMinutes  = 0,
+            targetBitrateKbps   = when (binding.rgBitrate.checkedRadioButtonId) {
+                binding.rbBitrate16m.id -> 16_000
+                binding.rbBitrate30m.id -> 30_000
+                binding.rbBitrate50m.id -> 50_000
+                else                    -> 0
+            },
         )
     }
 

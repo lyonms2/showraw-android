@@ -607,6 +607,35 @@
                 android:textColor="@color/white" android:textSize="13sp" android:buttonTint="@color/primary" />
         </RadioGroup>
 
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="BITRATE DE VÍDEO"
+            android:textColor="#999999" android:textSize="11sp"
+            android:letterSpacing="0.12" android:layout_marginBottom="10dp" />
+
+        <RadioGroup android:id="@+id/rg_bitrate"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:layout_marginBottom="24dp">
+            <RadioButton android:id="@+id/rb_bitrate_auto"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp" android:checked="true"
+                android:text="Automático  (CameraX decide por resolução)"
+                android:textColor="@color/white" android:textSize="13sp" android:buttonTint="@color/primary" />
+            <RadioButton android:id="@+id/rb_bitrate_16m"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:text="16 Mbps  (padrão, 1080p/4K conservador)"
+                android:textColor="@color/white" android:textSize="13sp" android:buttonTint="@color/primary" />
+            <RadioButton android:id="@+id/rb_bitrate_30m"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:text="30 Mbps  (alto, bom para 4K 30fps)"
+                android:textColor="@color/white" android:textSize="13sp" android:buttonTint="@color/primary" />
+            <RadioButton android:id="@+id/rb_bitrate_50m"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="50 Mbps  (máximo, 4K 60fps / câmera rápida)"
+                android:textColor="@color/white" android:textSize="13sp" android:buttonTint="@color/primary" />
+        </RadioGroup>
+
         <!-- Salvar / Exportar -->
         <Button
             android:id="@+id/btn_save_preset"

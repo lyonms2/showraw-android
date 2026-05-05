@@ -41,6 +41,7 @@ import com.showraw.android.databinding.FragmentRecordingBinding
 import com.showraw.android.presets.Preset
 import com.showraw.android.presets.PresetRepository
 import com.showraw.android.video.VideoCaptureManager
+import com.showraw.android.video.WbMode
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -70,6 +71,7 @@ class RecordingFragment : Fragment() {
     private var recordedMs  = 0L
     private var freeMbAtStart = 0L
     private var storageTickCount = 0
+    private var currentWbMode = WbMode.AUTO
 
     private val headsetReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -186,6 +188,7 @@ class RecordingFragment : Fragment() {
         binding.btnFlipCamera.setOnClickListener { flipCamera() }
         binding.btnStabilization.setOnClickListener { toggleStabilization() }
         binding.btnMonitoring.setOnClickListener { toggleMonitoring() }
+        binding.btnWb.setOnClickListener { cycleWbMode() }
 
         binding.btnSplContinue.setOnClickListener { binding.overlaySpl.visibility = View.GONE }
         binding.btnSplMic.setOnClickListener {
@@ -461,6 +464,7 @@ class RecordingFragment : Fragment() {
             _binding?.btnFlipCamera,
             _binding?.btnStabilization,
             _binding?.btnMonitoring,
+            _binding?.btnWb,
             _binding?.tvRecDot,
             _binding?.tvZoomLevel,
         ).forEach { v ->
@@ -523,6 +527,20 @@ class RecordingFragment : Fragment() {
     }
 
     private fun sanitize(s: String) = s.replace(Regex("[^a-zA-Z0-9_\\-]"), "_").take(40)
+
+    private fun cycleWbMode() {
+        val modes = WbMode.entries
+        currentWbMode = modes[(modes.indexOf(currentWbMode) + 1) % modes.size]
+        videoManager.setWbMode(currentWbMode)
+        binding.btnWb.text = currentWbMode.label
+        val isActive = currentWbMode != WbMode.AUTO
+        binding.btnWb.backgroundTintList = android.content.res.ColorStateList.valueOf(
+            if (isActive) Color.parseColor("#EF9F27") else Color.parseColor("#80000000")
+        )
+        binding.btnWb.setTextColor(
+            if (isActive) Color.parseColor("#0D0D0D") else Color.WHITE
+        )
+    }
 
     private fun updateAudioSourceBadge() {
         val b = _binding ?: return
